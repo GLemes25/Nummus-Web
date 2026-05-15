@@ -23,8 +23,8 @@ type AuthScreenProps = {
 
 const authSchema = z.object({
   name: z.string().optional(),
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("Insira um e-mail válido"),
+  password: z.string().min(1, "A senha é obrigatória"),
 });
 
 type AuthValues = z.infer<typeof authSchema>;
@@ -37,7 +37,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
     resolver: zodResolver(
       mode === "signup"
         ? authSchema.extend({
-            name: z.string().min(2, "Name must be at least 2 characters"),
+            name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
           })
         : authSchema,
     ),
@@ -58,7 +58,6 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
 
   return (
     <div className="bg-background min-h-screen flex items-center justify-center p-6">
-      {/* Decorative left panel — desktop only */}
       <div
         className="hidden lg:flex flex-col justify-between w-115 min-h-150 rounded-2xl p-12 relative overflow-hidden mr-10 border border-border shrink-0"
         style={{
@@ -69,7 +68,6 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
         <div className="absolute -top-15 -right-15 w-60 h-60 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.25)_0%,transparent_70%)] pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-50 h-50 rounded-full bg-[radial-gradient(circle,rgba(191,160,113,0.15)_0%,transparent_70%)] pointer-events-none" />
 
-        {/* Logo */}
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
@@ -85,30 +83,29 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
           <div>
             <div className="text-foreground font-semibold text-sm">Nummus</div>
             <div className="text-gold text-[10px] tracking-[2px]">
-              FINANCIAL ECOSYSTEM
+              ECOSSISTEMA FINANCEIRO
             </div>
           </div>
         </div>
 
-        {/* Headline */}
         <div>
           <h1 className="text-foreground mb-4 leading-tight text-3xl font-bold">
-            Your complete
+            Seu ecossistema
             <br />
-            <span className="text-gold">financial ecosystem</span>
+            <span className="text-gold">financeiro completo</span>
           </h1>
           <p className="text-muted-foreground leading-relaxed text-sm">
-            Track every transaction, manage multiple wallets, and get AI-powered
-            insights to reach your financial goals faster.
+            Acompanhe cada transação, gerencie múltiplas carteiras e obtenha
+            insights com IA para alcançar seus objetivos financeiros mais
+            rapidamente.
           </p>
         </div>
 
-        {/* Stats */}
         <div className="flex gap-8">
           {[
-            { value: "50K+", label: "Active Users" },
-            { value: "$2.4B", label: "Tracked" },
-            { value: "99.9%", label: "Uptime" },
+            { value: "50K+", label: "Usuários Ativos" },
+            { value: "$2.4B", label: "Rastreado" },
+            { value: "99.9%", label: "Disponibilidade" },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="text-gold font-bold text-2xl tracking-tight">
@@ -119,11 +116,11 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
           ))}
         </div>
 
-        {/* Testimonial card */}
         <div className="bg-muted/50 border border-zinc-700 rounded-xl p-4">
           <p className="text-zinc-300 text-sm leading-relaxed mb-3">
-            &ldquo;Nummus completely changed how I think about money. The AI
-            insights are <span className="text-gold">incredible</span>.&rdquo;
+            &ldquo;O Nummus transformou completamente como penso sobre dinheiro.
+            Os insights com IA são{" "}
+            <span className="text-gold">incríveis</span>.&rdquo;
           </p>
           <div className="flex items-center gap-2.5">
             <div
@@ -138,13 +135,12 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
               <div className="text-foreground text-sm font-medium">
                 Sarah L.
               </div>
-              <div className="text-zinc-600 text-xs">Product Designer</div>
+              <div className="text-zinc-600 text-xs">Designer de Produto</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Auth form card */}
       <motion.div
         key={mode}
         initial={{ opacity: 0, x: 16 }}
@@ -152,7 +148,6 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
         transition={{ duration: 0.3 }}
         className="bg-card border border-border rounded-2xl p-10 w-full max-w-100"
       >
-        {/* Mobile logo */}
         <div className="flex lg:hidden items-center gap-2.5 mb-7">
           <div
             className="w-8.5 h-8.5 rounded-[9px] flex items-center justify-center shrink-0"
@@ -165,16 +160,15 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
 
         <div className="mb-7">
           <h2 className="text-foreground mb-1.5 text-2xl font-bold">
-            {mode === "signin" ? "Welcome back" : "Create account"}
+            {mode === "signin" ? "Bem-vindo de volta" : "Criar conta"}
           </h2>
           <p className="text-muted-foreground text-sm">
             {mode === "signin"
-              ? "Sign in to continue to your dashboard"
-              : "Start your financial journey today"}
+              ? "Entre para continuar no seu painel"
+              : "Comece sua jornada financeira hoje"}
           </p>
         </div>
 
-        {/* Google button */}
         <Button
           type="button"
           variant="outline"
@@ -205,16 +199,15 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
               d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"
             />
           </svg>
-          Continue with Google
+          Continuar com Google
         </Button>
 
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-zinc-700 text-xs">or continue with email</span>
+          <span className="text-zinc-700 text-xs">ou continue com e-mail</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        {/* Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -227,7 +220,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-zinc-400 text-sm">
-                      Full Name
+                      Nome completo
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -248,12 +241,12 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-zinc-400 text-sm">
-                    Email address
+                    Endereço de e-mail
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="alex@example.com"
+                      placeholder="alex@exemplo.com"
                       className="bg-background border-border text-foreground"
                       {...field}
                     />
@@ -270,7 +263,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
                 <FormItem>
                   <div className="flex justify-between items-center">
                     <FormLabel className="text-zinc-400 text-sm">
-                      Password
+                      Senha
                     </FormLabel>
                     {mode === "signin" && (
                       <Button
@@ -279,7 +272,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
                         size="sm"
                         className="text-brand p-0 h-auto text-xs"
                       >
-                        Forgot password?
+                        Esqueceu a senha?
                       </Button>
                     )}
                   </div>
@@ -317,7 +310,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
               className="w-full mt-1 bg-brand text-brand-foreground hover:bg-brand/90"
             >
               {isLoading && <Loader2 size={15} className="animate-spin" />}
-              {mode === "signin" ? "Sign In" : "Create Account"}
+              {mode === "signin" ? "Entrar" : "Criar Conta"}
             </Button>
           </form>
         </Form>
@@ -325,8 +318,8 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
         <div className="text-center mt-6">
           <span className="text-zinc-600 text-sm">
             {mode === "signin"
-              ? "Don't have an account? "
-              : "Already have an account? "}
+              ? "Não tem uma conta? "
+              : "Já tem uma conta? "}
           </span>
           <Button
             type="button"
@@ -334,7 +327,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
             className="text-brand p-0 h-auto text-sm"
             onClick={handleModeSwitch}
           >
-            {mode === "signin" ? "Sign up free" : "Sign in"}
+            {mode === "signin" ? "Cadastre-se grátis" : "Entrar"}
           </Button>
         </div>
       </motion.div>

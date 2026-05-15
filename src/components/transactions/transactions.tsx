@@ -18,28 +18,35 @@ type Transaction = {
 };
 
 const allTransactions: Transaction[] = [
-  { id: 1, date: '2026-05-14', icon: '🛒', category: 'Food & Dining', description: 'Whole Foods Market', amount: -89.5, type: 'expense', wallet: 'Chase Checking' },
-  { id: 2, date: '2026-05-14', icon: '💼', category: 'Income', description: 'Monthly Salary — May', amount: 5200.0, type: 'income', wallet: 'Chase Checking' },
-  { id: 3, date: '2026-05-13', icon: '🚕', category: 'Transportation', description: 'Uber Ride · 12:34pm', amount: -24.99, type: 'expense', wallet: 'Chase Checking' },
-  { id: 4, date: '2026-05-13', icon: '🎬', category: 'Entertainment', description: 'Netflix Premium', amount: -17.99, type: 'expense', wallet: 'Chase Checking' },
-  { id: 5, date: '2026-05-12', icon: '🏋️', category: 'Health & Fitness', description: 'Gym Membership', amount: -49.0, type: 'expense', wallet: 'Chase Checking' },
-  { id: 6, date: '2026-05-12', icon: '☕', category: 'Food & Dining', description: 'Blue Bottle Coffee', amount: -7.5, type: 'expense', wallet: 'Cash' },
-  { id: 7, date: '2026-05-12', icon: '💸', category: 'Transfer', description: 'Transfer to Savings', amount: -500.0, type: 'transfer', wallet: 'Chase Checking' },
-  { id: 8, date: '2026-05-11', icon: '🏠', category: 'Housing', description: 'May Rent Payment', amount: -1800.0, type: 'expense', wallet: 'Chase Checking' },
-  { id: 9, date: '2026-05-11', icon: '📦', category: 'Shopping', description: 'Amazon Prime Order', amount: -67.4, type: 'expense', wallet: 'Chase Checking' },
-  { id: 10, date: '2026-05-10', icon: '💰', category: 'Income', description: 'Freelance Project — UI Kit', amount: 850.0, type: 'income', wallet: 'Chase Checking' },
-  { id: 11, date: '2026-05-10', icon: '⚡', category: 'Utilities', description: 'Electricity Bill', amount: -94.2, type: 'expense', wallet: 'Chase Checking' },
-  { id: 12, date: '2026-05-09', icon: '🛍️', category: 'Shopping', description: 'Zara — Spring Collection', amount: -142.0, type: 'expense', wallet: 'Chase Visa' },
-  { id: 13, date: '2026-05-09', icon: '🍕', category: 'Food & Dining', description: "Roberta's Pizza", amount: -38.5, type: 'expense', wallet: 'Chase Visa' },
-  { id: 14, date: '2026-05-08', icon: '📱', category: 'Utilities', description: 'Phone Bill — T-Mobile', amount: -55.0, type: 'expense', wallet: 'Chase Checking' },
-  { id: 15, date: '2026-05-08', icon: '🎵', category: 'Entertainment', description: 'Spotify Premium', amount: -9.99, type: 'expense', wallet: 'Chase Checking' },
+  { id: 1, date: '2026-05-14', icon: '🛒', category: 'Alimentação', description: 'Whole Foods Market', amount: -89.5, type: 'expense', wallet: 'Chase Checking' },
+  { id: 2, date: '2026-05-14', icon: '💼', category: 'Receita', description: 'Salário Mensal — Maio', amount: 5200.0, type: 'income', wallet: 'Chase Checking' },
+  { id: 3, date: '2026-05-13', icon: '🚕', category: 'Transporte', description: 'Uber Ride · 12:34', amount: -24.99, type: 'expense', wallet: 'Chase Checking' },
+  { id: 4, date: '2026-05-13', icon: '🎬', category: 'Entretenimento', description: 'Netflix Premium', amount: -17.99, type: 'expense', wallet: 'Chase Checking' },
+  { id: 5, date: '2026-05-12', icon: '🏋️', category: 'Saúde', description: 'Gym Membership', amount: -49.0, type: 'expense', wallet: 'Chase Checking' },
+  { id: 6, date: '2026-05-12', icon: '☕', category: 'Alimentação', description: 'Blue Bottle Coffee', amount: -7.5, type: 'expense', wallet: 'Dinheiro' },
+  { id: 7, date: '2026-05-12', icon: '💸', category: 'Transferência', description: 'Transferência para Poupança', amount: -500.0, type: 'transfer', wallet: 'Chase Checking' },
+  { id: 8, date: '2026-05-11', icon: '🏠', category: 'Moradia', description: 'Aluguel — Maio', amount: -1800.0, type: 'expense', wallet: 'Chase Checking' },
+  { id: 9, date: '2026-05-11', icon: '📦', category: 'Compras', description: 'Amazon Prime Order', amount: -67.4, type: 'expense', wallet: 'Chase Checking' },
+  { id: 10, date: '2026-05-10', icon: '💰', category: 'Receita', description: 'Projeto Freelance — Kit UI', amount: 850.0, type: 'income', wallet: 'Chase Checking' },
+  { id: 11, date: '2026-05-10', icon: '⚡', category: 'Utilidades', description: 'Electricity Bill', amount: -94.2, type: 'expense', wallet: 'Chase Checking' },
+  { id: 12, date: '2026-05-09', icon: '🛍️', category: 'Compras', description: 'Zara — Spring Collection', amount: -142.0, type: 'expense', wallet: 'Chase Visa' },
+  { id: 13, date: '2026-05-09', icon: '🍕', category: 'Alimentação', description: "Roberta's Pizza", amount: -38.5, type: 'expense', wallet: 'Chase Visa' },
+  { id: 14, date: '2026-05-08', icon: '📱', category: 'Utilidades', description: 'Phone Bill — T-Mobile', amount: -55.0, type: 'expense', wallet: 'Chase Checking' },
+  { id: 15, date: '2026-05-08', icon: '🎵', category: 'Entretenimento', description: 'Spotify Premium', amount: -9.99, type: 'expense', wallet: 'Chase Checking' },
 ];
+
+const filterLabels: Record<string, string> = {
+  all: 'Todos',
+  income: 'Receita',
+  expense: 'Despesa',
+  transfer: 'Transferência',
+};
 
 const formatDate = (dateStr: string): string => {
   const d = new Date(dateStr);
-  if (dateStr === '2026-05-14') return 'Today';
-  if (dateStr === '2026-05-13') return 'Yesterday';
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  if (dateStr === '2026-05-14') return 'Hoje';
+  if (dateStr === '2026-05-13') return 'Ontem';
+  return d.toLocaleDateString('pt-BR', { month: 'long', day: 'numeric' });
 };
 
 const groupByDate = (txs: Transaction[]) => {
@@ -50,6 +57,12 @@ const groupByDate = (txs: Transaction[]) => {
     groups[label].push(tx);
   });
   return groups;
+};
+
+const typeLabels: Record<string, string> = {
+  income: 'receita',
+  expense: 'despesa',
+  transfer: 'transferência',
 };
 
 type TransactionsProps = {
@@ -76,37 +89,34 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
 
   return (
     <div className="p-6 pt-7 max-w-[800px]">
-      {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">Transactions</h1>
-          <p className="text-muted-foreground m-0 text-sm">{filtered.length} transactions · May 2026</p>
+          <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">Transações</h1>
+          <p className="text-muted-foreground m-0 text-sm">{filtered.length} transações · Mai. 2026</p>
         </div>
         <Button onClick={onNewTransaction} className="bg-brand text-brand-foreground hover:bg-brand/90">
-          + New
+          + Novo
         </Button>
       </div>
 
-      {/* Summary strip */}
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div className="bg-income/[0.08] border border-income/20 rounded-xl px-4 py-3 flex justify-between items-center">
-          <span className="text-income/80 text-sm">Total Income</span>
+          <span className="text-income/80 text-sm">Receita Total</span>
           <span className="text-income font-bold text-base">+${totalIncome.toFixed(2)}</span>
         </div>
         <div className="bg-expense/[0.08] border border-expense/20 rounded-xl px-4 py-3 flex justify-between items-center">
-          <span className="text-expense/80 text-sm">Total Expenses</span>
+          <span className="text-expense/80 text-sm">Despesas Totais</span>
           <span className="text-expense font-bold text-base">-${totalExpense.toFixed(2)}</span>
         </div>
       </div>
 
-      {/* Search + Filters */}
       <div className="flex gap-2.5 mb-5 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search transactions…"
+            placeholder="Buscar transações…"
             className="pl-9 bg-card border-border text-foreground"
           />
         </div>
@@ -119,16 +129,15 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
               size="sm"
               className={filter === f ? 'bg-brand/15 text-brand-muted border-brand/40' : 'bg-card border-border text-muted-foreground'}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {filterLabels[f]}
             </Button>
           ))}
         </div>
       </div>
 
-      {/* Transaction groups */}
       <AnimatePresence>
         {dateKeys.length === 0 ? (
-          <div className="text-center py-16 text-zinc-600">No transactions match your filter</div>
+          <div className="text-center py-16 text-zinc-600">Nenhuma transação corresponde ao filtro</div>
         ) : (
           dateKeys.map((dateLabel, gi) => (
             <motion.div
@@ -165,7 +174,7 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                         {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toFixed(2)}
                       </div>
                       <div className="text-zinc-700 text-xs mt-0.5">
-                        {tx.type === 'transfer' ? 'transfer' : tx.type}
+                        {typeLabels[tx.type]}
                       </div>
                     </div>
                     <ChevronRight size={14} className="text-zinc-700 ml-2 shrink-0" />

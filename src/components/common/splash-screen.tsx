@@ -42,7 +42,7 @@ const SplashScreen = () => (
         NUMMUS
       </div>
       <div className="text-zinc-700 tracking-[3px] text-xs">
-        FINANCIAL CONTROL ECOSYSTEM
+        ECOSSISTEMA DE CONTROLE FINANCEIRO
       </div>
     </motion.div>
 

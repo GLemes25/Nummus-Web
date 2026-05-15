@@ -37,66 +37,65 @@ type SettingSection = {
 
 const sections: SettingSection[] = [
   {
-    label: "Account",
+    label: "Conta",
     icon: User,
     iconColor: "#7C3AED",
     items: [
-      { label: "Full Name", value: "Alex Johnson" },
-      { label: "Email address", value: "alex@example.com" },
-      { label: "Phone number", value: "+1 (555) 012-3456" },
-      { label: "Currency", value: "USD — US Dollar" },
+      { label: "Nome Completo", value: "Alex Johnson" },
+      { label: "Endereço de e-mail", value: "alex@exemplo.com" },
+      { label: "Número de telefone", value: "+1 (555) 012-3456" },
+      { label: "Moeda", value: "USD — Dólar Americano" },
     ],
   },
   {
-    label: "Security",
+    label: "Segurança",
     icon: Lock,
     iconColor: "#F43F5E",
     items: [
-      { label: "Change password" },
-      { label: "Two-factor authentication", toggle: true, toggled: false },
-      { label: "Biometric login", toggle: true, toggled: true },
-      { label: "Active sessions", value: "2 devices" },
+      { label: "Alterar senha" },
+      { label: "Autenticação de dois fatores", toggle: true, toggled: false },
+      { label: "Login biométrico", toggle: true, toggled: true },
+      { label: "Sessões ativas", value: "2 dispositivos" },
     ],
   },
   {
-    label: "Notifications",
+    label: "Notificações",
     icon: Bell,
     iconColor: "#BFA071",
     items: [
-      { label: "Transaction alerts", toggle: true, toggled: true },
-      { label: "Weekly spending report", toggle: true, toggled: true },
-      { label: "Budget limit warnings", toggle: true, toggled: false },
-      { label: "Promotional emails", toggle: true, toggled: false },
+      { label: "Alertas de transação", toggle: true, toggled: true },
+      { label: "Relatório semanal de gastos", toggle: true, toggled: true },
+      { label: "Avisos de limite de orçamento", toggle: true, toggled: false },
+      { label: "E-mails promocionais", toggle: true, toggled: false },
     ],
   },
   {
-    label: "Preferences",
+    label: "Preferências",
     icon: Globe,
     iconColor: "#06B6D4",
     items: [
-      { label: "Language", value: "English (US)" },
-      { label: "Date format", value: "MM/DD/YYYY" },
-      { label: "Week starts on", value: "Monday" },
-      { label: "Dark mode", toggle: true, toggled: true },
+      { label: "Idioma", value: "Português (BR)" },
+      { label: "Formato de data", value: "DD/MM/AAAA" },
+      { label: "Semana começa em", value: "Segunda-feira" },
+      { label: "Modo escuro", toggle: true, toggled: true },
     ],
   },
 ];
 
 const quickLinks = [
-  { label: "Subscription & Billing", icon: CreditCard, color: "#BFA071" },
-  { label: "Export my data", icon: Download, color: "#10B981" },
-  { label: "Privacy & Security", icon: Shield, color: "#7C3AED" },
-  { label: "Connected apps", icon: Smartphone, color: "#06B6D4" },
-  { label: "Help & Support", icon: HelpCircle, color: "#71717a" },
+  { label: "Assinatura e Cobrança", icon: CreditCard, color: "#BFA071" },
+  { label: "Exportar meus dados", icon: Download, color: "#10B981" },
+  { label: "Privacidade e Segurança", icon: Shield, color: "#7C3AED" },
+  { label: "Apps conectados", icon: Smartphone, color: "#06B6D4" },
+  { label: "Ajuda e Suporte", icon: HelpCircle, color: "#71717a" },
 ];
 
 const UserProfile = ({ onLogout }: UserProfileProps) => (
   <div className="p-6 pt-7 max-w-[720px]">
     <h1 className="text-foreground m-0 mb-7 tracking-tight text-2xl font-bold">
-      Profile & Settings
+      Perfil e Configurações
     </h1>
 
-    {/* Avatar + info card */}
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
@@ -107,7 +106,6 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
     >
       <div className="absolute -top-8 -right-8 w-[140px] h-[140px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.15)_0%,transparent_70%)]" />
 
-      {/* Avatar */}
       <div className="relative">
         <div
           className="w-[72px] h-[72px] rounded-full flex items-center justify-center text-[26px] text-foreground font-extrabold border-[3px] border-muted shrink-0"
@@ -124,13 +122,12 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
         </Button>
       </div>
 
-      {/* Info */}
       <div className="flex-1">
         <div className="text-foreground font-bold text-lg tracking-tight mb-0.5">
           Alex Johnson
         </div>
         <div className="text-muted-foreground text-sm mb-2.5">
-          alex@example.com
+          alex@exemplo.com
         </div>
         <div className="inline-flex items-center gap-1.5 bg-gold/10 border border-gold/30 rounded-full px-3 py-1">
           <Crown size={12} className="text-gold" />
@@ -140,14 +137,12 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
         </div>
       </div>
 
-      {/* Member since */}
       <div className="text-right hidden sm:block">
-        <div className="text-zinc-600 text-xs mb-0.5">Member since</div>
-        <div className="text-zinc-400 text-sm">January 2025</div>
+        <div className="text-zinc-600 text-xs mb-0.5">Membro desde</div>
+        <div className="text-zinc-400 text-sm">Janeiro de 2025</div>
       </div>
     </motion.div>
 
-    {/* Quick links */}
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -181,7 +176,6 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
       })}
     </motion.div>
 
-    {/* Settings sections */}
     {sections.map((section, si) => {
       const SectionIcon = section.icon;
       return (
@@ -238,7 +232,6 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
       );
     })}
 
-    {/* Danger zone */}
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -252,14 +245,14 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
           className="w-full gap-2"
         >
           <LogOut size={16} />
-          Sign Out
+          Sair
         </Button>
 
         <Button
           variant="outline"
           className="w-full text-zinc-700 border-border text-sm"
         >
-          Delete account permanently
+          Excluir conta permanentemente
         </Button>
       </div>
 
@@ -270,7 +263,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
           size="sm"
           className="text-zinc-600 p-0 h-auto text-xs"
         >
-          Privacy Policy
+          Política de Privacidade
         </Button>
         <span className="text-zinc-700 text-xs"> · </span>
         <Button
@@ -278,7 +271,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
           size="sm"
           className="text-zinc-600 p-0 h-auto text-xs"
         >
-          Terms of Service
+          Termos de Serviço
         </Button>
       </div>
     </motion.div>

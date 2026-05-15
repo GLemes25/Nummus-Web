@@ -17,29 +17,29 @@ import CustomTooltip from '@/components/dashboard/custom-tooltip';
 import type { AppView } from '@/types/app';
 
 const areaData = [
-  { month: 'Dec', balance: 98200 },
+  { month: 'Dez', balance: 98200 },
   { month: 'Jan', balance: 102400 },
-  { month: 'Feb', balance: 99800 },
+  { month: 'Fev', balance: 99800 },
   { month: 'Mar', balance: 108600 },
-  { month: 'Apr', balance: 119200 },
-  { month: 'May', balance: 124850 },
+  { month: 'Abr', balance: 119200 },
+  { month: 'Mai', balance: 124850 },
 ];
 
 const categoryData = [
-  { name: 'Housing', value: 1800, color: '#7C3AED' },
-  { name: 'Food', value: 680, color: '#10B981' },
-  { name: 'Transport', value: 340, color: '#F43F5E' },
-  { name: 'Shopping', value: 520, color: '#BFA071' },
-  { name: 'Health', value: 180, color: '#06B6D4' },
-  { name: 'Other', value: 261, color: '#8B5CF6' },
+  { name: 'Moradia', value: 1800, color: '#7C3AED' },
+  { name: 'Alimentação', value: 680, color: '#10B981' },
+  { name: 'Transporte', value: 340, color: '#F43F5E' },
+  { name: 'Compras', value: 520, color: '#BFA071' },
+  { name: 'Saúde', value: 180, color: '#06B6D4' },
+  { name: 'Outros', value: 261, color: '#8B5CF6' },
 ];
 
 const recentTransactions = [
-  { id: 1, date: 'Today', icon: '🛒', category: 'Food & Dining', description: 'Whole Foods Market', amount: -89.5 },
-  { id: 2, date: 'Today', icon: '💼', category: 'Income', description: 'Monthly Salary — May', amount: 5200.0 },
-  { id: 3, date: 'Yesterday', icon: '🚕', category: 'Transportation', description: 'Uber Ride', amount: -24.99 },
-  { id: 4, date: 'Yesterday', icon: '🎬', category: 'Entertainment', description: 'Netflix Premium', amount: -17.99 },
-  { id: 5, date: 'May 12', icon: '🏋️', category: 'Health & Fitness', description: 'Gym Membership', amount: -49.0 },
+  { id: 1, date: 'Hoje', icon: '🛒', category: 'Alimentação', description: 'Whole Foods Market', amount: -89.5 },
+  { id: 2, date: 'Hoje', icon: '💼', category: 'Receita', description: 'Salário Mensal — Maio', amount: 5200.0 },
+  { id: 3, date: 'Ontem', icon: '🚕', category: 'Transporte', description: 'Uber Ride', amount: -24.99 },
+  { id: 4, date: 'Ontem', icon: '🎬', category: 'Entretenimento', description: 'Netflix Premium', amount: -17.99 },
+  { id: 5, date: '12 de mai.', icon: '🏋️', category: 'Saúde', description: 'Gym Membership', amount: -49.0 },
 ];
 
 type DashboardProps = {
@@ -49,11 +49,10 @@ type DashboardProps = {
 
 const Dashboard = ({ onNavigate }: DashboardProps) => (
   <div className="p-6 pt-7 max-w-[1100px]">
-    {/* Header */}
     <div className="flex items-center justify-between mb-7">
       <div>
-        <div className="text-muted-foreground text-sm mb-0.5">Thursday, May 14, 2026</div>
-        <h1 className="text-foreground m-0 tracking-tight text-2xl font-bold">Good morning, Alex 👋</h1>
+        <div className="text-muted-foreground text-sm mb-0.5">Quinta-feira, 14 de maio de 2026</div>
+        <h1 className="text-foreground m-0 tracking-tight text-2xl font-bold">Bom dia, Alex 👋</h1>
       </div>
       <div className="flex gap-2.5 items-center">
         <Button variant="outline" size="icon" className="relative bg-card border-border text-muted-foreground">
@@ -66,7 +65,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
       </div>
     </div>
 
-    {/* Net Worth Hero card */}
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
@@ -76,23 +74,22 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
     >
       <div className="absolute -top-12 -right-12 w-[220px] h-[220px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.18)_0%,transparent_70%)]" />
       <div className="absolute -bottom-8 left-[100px] w-[140px] h-[140px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(191,160,113,0.08)_0%,transparent_70%)]" />
-      <div className="text-muted-foreground text-xs tracking-[1.5px] mb-2.5">TOTAL NET WORTH</div>
-      <div className="text-gold text-5xl font-extrabold tracking-tight mb-3 leading-none">$124,850.00</div>
+      <div className="text-muted-foreground text-xs tracking-[1.5px] mb-2.5">PATRIMÔNIO LÍQUIDO TOTAL</div>
+      <div className="text-gold text-5xl font-extrabold tracking-tight mb-3 leading-none">$124.850,00</div>
       <div className="flex items-center gap-2.5 flex-wrap">
         <div className="flex items-center gap-1 bg-income/10 text-income px-3 py-1 rounded-full text-sm font-medium border border-income/20">
           <TrendingUp size={13} />
-          +4.74% this month
+          +4,74% este mês
         </div>
-        <span className="text-zinc-600 text-sm">+$5,650 since April</span>
+        <span className="text-zinc-600 text-sm">+$5.650 desde abril</span>
       </div>
     </motion.div>
 
-    {/* Stats row */}
     <div className="grid grid-cols-3 gap-4 mb-5">
       {[
-        { label: 'Income', value: '$5,200.00', change: '+12.3% vs last month', type: 'income', Icon: ArrowUpRight },
-        { label: 'Expenses', value: '$3,781.48', change: '-8.1% vs last month', type: 'expense', Icon: ArrowDownRight },
-        { label: 'Savings', value: '$1,418.52', change: '27.3% savings rate', type: 'neutral', Icon: Wallet2 },
+        { label: 'Receita', value: '$5.200,00', change: '+12,3% vs. mês anterior', type: 'income', Icon: ArrowUpRight },
+        { label: 'Despesas', value: '$3.781,48', change: '-8,1% vs. mês anterior', type: 'expense', Icon: ArrowDownRight },
+        { label: 'Economias', value: '$1.418,52', change: '27,3% taxa de poupança', type: 'neutral', Icon: Wallet2 },
       ].map((stat, i) => (
         <motion.div
           key={stat.label}
@@ -128,13 +125,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
       ))}
     </div>
 
-    {/* Charts row */}
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-5">
-      {/* Area chart */}
       <div className="bg-card border border-border rounded-xl p-6">
         <div className="mb-5">
-          <h3 className="text-foreground m-0 mb-1 font-semibold">Balance Trend</h3>
-          <p className="text-muted-foreground text-sm m-0">Net worth over the last 6 months</p>
+          <h3 className="text-foreground m-0 mb-1 font-semibold">Tendência de Saldo</h3>
+          <p className="text-muted-foreground text-sm m-0">Patrimônio líquido nos últimos 6 meses</p>
         </div>
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart data={areaData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
@@ -151,11 +146,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
         </ResponsiveContainer>
       </div>
 
-      {/* Donut chart */}
       <div className="bg-card border border-border rounded-xl p-6">
         <div className="mb-3.5">
-          <h3 className="text-foreground m-0 mb-1 font-semibold">Spending</h3>
-          <p className="text-muted-foreground text-sm m-0">By category · May 2026</p>
+          <h3 className="text-foreground m-0 mb-1 font-semibold">Gastos</h3>
+          <p className="text-muted-foreground text-sm m-0">Por categoria · Mai. 2026</p>
         </div>
         <ResponsiveContainer width="100%" height={150}>
           <PieChart>
@@ -184,12 +178,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
       </div>
     </div>
 
-    {/* Recent Transactions */}
     <div className="bg-card border border-border rounded-xl p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h3 className="text-foreground m-0 mb-0.5 font-semibold">Recent Transactions</h3>
-          <p className="text-muted-foreground text-sm m-0">Your latest activity</p>
+          <h3 className="text-foreground m-0 mb-0.5 font-semibold">Transações Recentes</h3>
+          <p className="text-muted-foreground text-sm m-0">Sua atividade recente</p>
         </div>
         <Button
           variant="link"
@@ -197,7 +190,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
           className="text-brand p-0 h-auto gap-1"
           onClick={() => onNavigate('transactions')}
         >
-          View all <ChevronRight size={14} />
+          Ver todas <ChevronRight size={14} />
         </Button>
       </div>
 

@@ -14,18 +14,18 @@ type TransactionModalProps = {
 type TxType = 'expense' | 'income' | 'transfer';
 
 const categories = [
-  { id: 'food', label: 'Food', icon: '🍕' },
-  { id: 'transport', label: 'Transport', icon: '🚕' },
-  { id: 'shopping', label: 'Shopping', icon: '🛍️' },
-  { id: 'health', label: 'Health', icon: '💊' },
-  { id: 'housing', label: 'Housing', icon: '🏠' },
-  { id: 'entertainment', label: 'Entertain.', icon: '🎬' },
-  { id: 'utilities', label: 'Utilities', icon: '⚡' },
-  { id: 'travel', label: 'Travel', icon: '✈️' },
-  { id: 'salary', label: 'Salary', icon: '💼' },
+  { id: 'food', label: 'Alimentação', icon: '🍕' },
+  { id: 'transport', label: 'Transporte', icon: '🚕' },
+  { id: 'shopping', label: 'Compras', icon: '🛍️' },
+  { id: 'health', label: 'Saúde', icon: '💊' },
+  { id: 'housing', label: 'Moradia', icon: '🏠' },
+  { id: 'entertainment', label: 'Entreten.', icon: '🎬' },
+  { id: 'utilities', label: 'Utilidades', icon: '⚡' },
+  { id: 'travel', label: 'Viagem', icon: '✈️' },
+  { id: 'salary', label: 'Salário', icon: '💼' },
   { id: 'freelance', label: 'Freelance', icon: '💻' },
-  { id: 'investment', label: 'Investment', icon: '📈' },
-  { id: 'other', label: 'Other', icon: '📌' },
+  { id: 'investment', label: 'Investimento', icon: '📈' },
+  { id: 'other', label: 'Outro', icon: '📌' },
 ];
 
 const wallets = ['Chase Checking', 'Chase Visa', 'Savings Account', 'Cash'];
@@ -34,6 +34,18 @@ const typeColor: Record<TxType, string> = {
   expense: '#F43F5E',
   income: '#10B981',
   transfer: '#BFA071',
+};
+
+const typeLabels: Record<TxType, string> = {
+  expense: 'despesa',
+  income: 'receita',
+  transfer: 'transferência',
+};
+
+const amountPrefix: Record<TxType, string> = {
+  expense: 'Debitado de',
+  income: 'Adicionado a',
+  transfer: 'Movendo de',
 };
 
 const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
@@ -63,7 +75,7 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
       setIsAiLoading(false);
       setAiSuggested(true);
       setSelectedCategory('food');
-      setDescription('Automatic AI categorization: Food & Dining');
+      setDescription('Categorização automática por IA: Alimentação');
     }, 1400);
   };
 
@@ -82,7 +94,6 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -93,7 +104,6 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
             className="fixed inset-0 bg-black/70 backdrop-blur-[6px] z-[200]"
           />
 
-          {/* Modal panel — 90% opacity per UI rules */}
           <motion.div
             key="modal"
             initial={{ opacity: 0, y: 40, scale: 0.97 }}
@@ -102,20 +112,17 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
             transition={{ duration: 0.25, type: 'spring', stiffness: 320, damping: 30 }}
             className="fixed bottom-0 left-0 right-0 z-[201] ui-surface-dark border-t border-zinc-700 rounded-t-[20px] pb-8 max-h-[95vh] overflow-y-auto lg:max-w-lg lg:mx-auto lg:rounded-2xl lg:bottom-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:border lg:border-zinc-700"
           >
-            {/* Drag handle (mobile) */}
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 rounded-full bg-zinc-700 lg:hidden" />
             </div>
 
-            {/* Header */}
             <div className="flex items-center justify-between px-6 pt-3 pb-5">
-              <h2 className="text-foreground m-0 text-xl font-bold">New Transaction</h2>
+              <h2 className="text-foreground m-0 text-xl font-bold">Nova Transação</h2>
               <Button variant="secondary" size="icon" className="bg-muted text-muted-foreground" onClick={onClose}>
                 <X size={16} />
               </Button>
             </div>
 
-            {/* Type toggle */}
             <div className="px-6 pb-5">
               <div className="flex bg-zinc-900 rounded-xl p-0.5 border border-border">
                 {(['expense', 'income', 'transfer'] as TxType[]).map((t) => (
@@ -130,15 +137,14 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                       borderBottom: txType === t ? `2px solid ${typeColor[t]}` : '2px solid transparent',
                     }}
                   >
-                    {t}
+                    {typeLabels[t]}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Amount display */}
             <div className="text-center px-6 pb-7 border-b border-border">
-              <div className="text-zinc-600 text-xs tracking-[1px] mb-2">AMOUNT</div>
+              <div className="text-zinc-600 text-xs tracking-[1px] mb-2">VALOR</div>
               <div
                 className="text-5xl font-extrabold tracking-tight leading-none mb-1.5 min-h-[52px] transition-colors duration-200"
                 style={{
@@ -148,12 +154,11 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                 ${amountDisplay}
               </div>
               <div className="text-zinc-600 text-sm">
-                {txType === 'expense' ? 'Deducted from' : txType === 'income' ? 'Added to' : 'Moving from'}{' '}
+                {amountPrefix[txType]}{' '}
                 <span className="text-zinc-400">{selectedWallet}</span>
               </div>
             </div>
 
-            {/* Numpad */}
             <div className="px-6 py-5">
               <div className="grid grid-cols-3 gap-2.5">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'backspace'].map((key) => (
@@ -173,9 +178,7 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
               </div>
             </div>
 
-            {/* Details */}
             <div className="px-6 flex flex-col gap-4">
-              {/* AI categorize */}
               <Button
                 onClick={handleAI}
                 disabled={isAiLoading}
@@ -191,21 +194,20 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                 {isAiLoading ? (
                   <>
                     <span className="animate-spin inline-block">⟳</span>
-                    Analyzing transaction…
+                    Analisando transação…
                   </>
                 ) : aiSuggested ? (
-                  <>✓ AI categorized successfully</>
+                  <>✓ Categorizado com IA</>
                 ) : (
                   <>
                     <Sparkles size={15} />
-                    Categorize with AI
+                    Categorizar com IA
                   </>
                 )}
               </Button>
 
-              {/* Category grid */}
               <div>
-                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2.5">CATEGORY</div>
+                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2.5">CATEGORIA</div>
                 <div className="grid grid-cols-4 gap-2">
                   {categories.map((cat) => (
                     <button
@@ -226,20 +228,18 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                 </div>
               </div>
 
-              {/* Description */}
               <div>
-                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">NOTE</div>
+                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">NOTA</div>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Add a description…"
+                  placeholder="Adicionar uma descrição…"
                   className="bg-zinc-900 border-border text-foreground"
                 />
               </div>
 
-              {/* Wallet selector */}
               <div>
-                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">WALLET</div>
+                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">CARTEIRA</div>
                 <div className="relative">
                   <select
                     value={selectedWallet}
@@ -256,16 +256,14 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                 </div>
               </div>
 
-              {/* Date */}
               <div>
-                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">DATE</div>
+                <div className="text-muted-foreground text-xs tracking-[0.8px] mb-2">DATA</div>
                 <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-zinc-900 border border-border rounded-lg text-zinc-400 text-sm cursor-pointer">
                   <Calendar size={15} className="text-zinc-600 shrink-0" />
-                  Today — May 14, 2026
+                  Hoje — 14 de mai. de 2026
                 </div>
               </div>
 
-              {/* Submit */}
               <Button
                 onClick={handleSubmit}
                 className="w-full mt-1 text-foreground font-semibold text-[15px]"
@@ -284,7 +282,7 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                       : '0 4px 16px rgba(124,58,237,0.35)',
                 }}
               >
-                Save Transaction
+                Salvar Transação
               </Button>
             </div>
           </motion.div>
