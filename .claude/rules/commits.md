@@ -32,9 +32,14 @@ Use estes commits passados do repositório como seu padrão de tom e estrutura:
 - `refactor: update rules to claude code`
 - `style: remove gradient color to match minimalist design`
 
-## 4. Fluxo de Execução
+## 4. Arquivo de Task
+
+Sempre que existir um arquivo de task correspondente ao trabalho realizado (ex: `tasks/03.md`), ele **deve** ser incluído no mesmo commit. Adicione-o ao stage junto com os demais arquivos antes de commitar.
+
+## 5. Fluxo de Execução
 
 1. Analise brevemente os arquivos modificados (adicione-os ao _stage_ com `git add` se o usuário solicitar).
-2. Gere a mensagem de commit apropriada silenciosamente em inglês.
-3. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
-4. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.
+2. Verifique se há um arquivo de task em `tasks/` relacionado ao trabalho e adicione-o ao stage.
+3. Gere a mensagem de commit apropriada silenciosamente em inglês.
+4. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
+5. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.
