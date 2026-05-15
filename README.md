@@ -1,5 +1,13 @@
 # Nummus - Web Application
 
+![Status](https://img.shields.io/badge/Status-Em_Produção-success?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
+
 > Projeto desenvolvido com foco em demonstrar **engenharia de frontend avançada**, UX/UI de alto padrão (Luxury Premium Design) e desenvolvimento focado em performance para uma plataforma SaaS de gestão financeira e _Wealth Management_.
 
 ---
@@ -48,6 +56,7 @@ A plataforma aplica um **Design System Luxury Rigoroso** construído do zero. Ut
 
 - pnpm
 - Eslint + Prettier (Padronização de código).
+- Vercel (Hospedagem em Produção)
 
 ---
 
@@ -75,15 +84,6 @@ src/
 
 ```
 
-## 🤝 Regras de Contribuição
-
-Para manter a consistência e a qualidade do projeto, siga as regras estabelecidas:
-
-1. **Idioma de Documentação:** Todos os arquivos de regras de contribuição, `README.md` e documentação técnica de desenvolvimento devem ser escritos em **Português**.
-2. **Idioma de Commits:** Todas as mensagens de commit (mensagens reais executadas no repositório, ex: `feat:`, `fix:`) devem ser escritas estritamente em **Inglês**.
-
----
-
 ## 🚀 Como Executar o Projeto
 
 ```bash
@@ -101,10 +101,10 @@ pnpm dev
 
 ```
 
-> Acesse http://localhost:3000 para visualizar a aplicação.
-
----
-
 ### 👤 Autor
 
 ## Gabriel Lemes de Oliveira
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/gabriel-lemes-G25)
+[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:gabriellemes924@gmail.com)
+[![Whatsapp](https://img.shields.io/badge/Whatsapp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/5567991179190)
