@@ -88,7 +88,7 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
   const totalExpense = filtered.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
 
   return (
-    <div className="p-6 pt-7 max-w-[800px]">
+    <div className="p-6 pt-7 max-w-200">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">Transações</h1>
@@ -100,18 +100,18 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="bg-income/[0.08] border border-income/20 rounded-xl px-4 py-3 flex justify-between items-center">
+        <div className="bg-income/8 border border-income/20 rounded-xl px-4 py-3 flex justify-between items-center">
           <span className="text-income/80 text-sm">Receita Total</span>
           <span className="text-income font-bold text-base">+${totalIncome.toFixed(2)}</span>
         </div>
-        <div className="bg-expense/[0.08] border border-expense/20 rounded-xl px-4 py-3 flex justify-between items-center">
+        <div className="bg-expense/8 border border-expense/20 rounded-xl px-4 py-3 flex justify-between items-center">
           <span className="text-expense/80 text-sm">Despesas Totais</span>
           <span className="text-expense font-bold text-base">-${totalExpense.toFixed(2)}</span>
         </div>
       </div>
 
       <div className="flex gap-2.5 mb-5 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-50">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
           <Input
             value={search}
@@ -155,7 +155,7 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                 {grouped[dateLabel].map((tx, i) => (
                   <div
                     key={tx.id}
-                    className="flex items-center px-4 py-3.5 cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    className="flex items-center px-4 py-3.5 cursor-pointer hover:bg-foreground/2 transition-colors"
                     style={{ borderBottom: i < grouped[dateLabel].length - 1 ? '1px solid #1f1f22' : 'none' }}
                   >
                     <div className="w-[42px] h-[42px] rounded-[11px] bg-muted flex items-center justify-center text-[19px] mr-3.5 shrink-0">

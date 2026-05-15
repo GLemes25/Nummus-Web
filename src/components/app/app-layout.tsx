@@ -42,7 +42,7 @@ const AppLayout = ({
   onToggleTransactionModal,
 }: AppLayoutProps) => (
   <div className="bg-background min-h-screen flex">
-    <aside className="hidden lg:flex flex-col fixed h-screen w-[240px] border-r border-border bg-card z-20 shrink-0">
+    <aside className="hidden lg:flex flex-col fixed h-screen w-60 border-r border-border bg-card z-20 shrink-0">
       <div className="px-5 pt-6 pb-5 border-b border-zinc-900">
         <div className="flex items-center gap-3">
           <div className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(145deg, #BFA071, #8B6A40)', boxShadow: '0 4px 10px rgba(191,160,113,0.25)' }}>
@@ -66,7 +66,7 @@ const AppLayout = ({
               className={`w-full justify-start gap-3 px-3 py-2.5 h-auto rounded-lg relative text-sm font-normal ${
                 isActive
                   ? 'bg-brand/10 text-brand hover:bg-brand/15 font-medium'
-                  : 'text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-foreground/4 hover:text-foreground'
               }`}
               onClick={() => onNavigate(item.id)}
             >
@@ -97,7 +97,7 @@ const AppLayout = ({
       </div>
     </aside>
 
-    <main className="lg:ml-[240px] flex-1 pb-20 min-h-screen">
+    <main className="lg:ml-60 flex-1 pb-20 min-h-screen">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentView}

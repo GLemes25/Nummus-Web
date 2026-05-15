@@ -91,7 +91,7 @@ const quickLinks = [
 ];
 
 const UserProfile = ({ onLogout }: UserProfileProps) => (
-  <div className="p-6 pt-7 max-w-[720px]">
+  <div className="p-6 pt-7 max-w-180">
     <h1 className="text-foreground m-0 mb-7 tracking-tight text-2xl font-bold">
       Perfil e Configurações
     </h1>
@@ -104,11 +104,11 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
         background: "linear-gradient(135deg, #18181b 0%, #1e1030 100%)",
       }}
     >
-      <div className="absolute -top-8 -right-8 w-[140px] h-[140px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.15)_0%,transparent_70%)]" />
+      <div className="absolute -top-8 -right-8 w-35 h-35 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.15)_0%,transparent_70%)]" />
 
       <div className="relative">
         <div
-          className="w-[72px] h-[72px] rounded-full flex items-center justify-center text-[26px] text-foreground font-extrabold border-[3px] border-muted shrink-0"
+          className="w-18 h-18 rounded-full flex items-center justify-center text-[26px] text-foreground font-extrabold border-[3px] border-muted shrink-0"
           style={{ background: "linear-gradient(135deg, #7C3AED, #5B21B6)" }}
         >
           AJ
@@ -155,7 +155,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
           <Button
             key={link.label}
             variant="ghost"
-            className="w-full flex items-center gap-3.5 px-5 py-3.5 h-auto justify-start rounded-none hover:bg-foreground/[0.02]"
+            className="w-full flex items-center gap-3.5 px-5 py-3.5 h-auto justify-start rounded-none hover:bg-foreground/2"
             style={{
               borderBottom:
                 i < quickLinks.length - 1 ? "1px solid #1f1f22" : "none",
@@ -202,7 +202,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
             {section.items.map((item, ii) => (
               <div
                 key={item.label}
-                className={`flex items-center px-[18px] py-[13px] ${!item.toggle ? "hover:bg-foreground/[0.02] cursor-pointer transition-colors" : ""}`}
+                className={`flex items-center px-[18px] py-[13px] ${!item.toggle ? "hover:bg-foreground/2 cursor-pointer transition-colors" : ""}`}
                 style={{
                   borderBottom:
                     ii < section.items.length - 1

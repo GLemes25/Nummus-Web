@@ -48,7 +48,7 @@ const Wallets = () => {
   const netWorth = totalAssets - totalLiabilities;
 
   return (
-    <div className="p-6 pt-7 max-w-[900px]">
+    <div className="p-6 pt-7 max-w-225">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">
@@ -101,11 +101,11 @@ const Wallets = () => {
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl p-[22px] relative overflow-hidden cursor-pointer min-h-[160px] flex flex-col justify-between"
+                  className="rounded-2xl p-[22px] relative overflow-hidden cursor-pointer min-h-40 flex flex-col justify-between"
                   style={{ background: wallet.gradient }}
                 >
-                  <div className="absolute -top-8 -right-8 w-[120px] h-[120px] rounded-full bg-white/[0.08] pointer-events-none" />
-                  <div className="absolute -bottom-5 -left-5 w-[100px] h-[100px] rounded-full bg-black/10 pointer-events-none" />
+                  <div className="absolute -top-8 -right-8 w-30 h-30 rounded-full bg-white/8 pointer-events-none" />
+                  <div className="absolute -bottom-5 -left-5 w-25 h-25 rounded-full bg-black/10 pointer-events-none" />
 
                   <div className="flex justify-between items-start">
                     <div className="w-[38px] h-[38px] rounded-[10px] bg-white/15 flex items-center justify-center">
@@ -131,7 +131,7 @@ const Wallets = () => {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: walletData.length * 0.06 }}
-              className="rounded-2xl border-2 border-dashed border-border bg-transparent p-[22px] flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-[160px] text-zinc-600 transition-colors hover:border-brand hover:text-brand"
+              className="rounded-2xl border-2 border-dashed border-border bg-transparent p-[22px] flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-40 text-zinc-600 transition-colors hover:border-brand hover:text-brand"
             >
               <Plus size={24} />
               <span className="text-sm">Adicionar Carteira</span>
@@ -147,7 +147,7 @@ const Wallets = () => {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="flex items-center px-5 py-3.5 cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                className="flex items-center px-5 py-3.5 cursor-pointer hover:bg-foreground/2 transition-colors"
                 style={{ borderBottom: i < categoryData.length - 1 ? '1px solid #1f1f22' : 'none' }}
               >
                 <div

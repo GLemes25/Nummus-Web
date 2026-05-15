@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 const SplashScreen = () => (
   <div className="bg-background h-screen w-screen flex flex-col items-center justify-center gap-7 relative overflow-hidden">
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div className="w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.08)_0%,transparent_70%)]" />
+      <div className="w-100 h-100 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.08)_0%,transparent_70%)]" />
     </div>
 
     <motion.div
@@ -52,7 +52,7 @@ const SplashScreen = () => (
       transition={{ delay: 0.6 }}
       className="mt-4"
     >
-      <div className="w-[120px] h-0.5 bg-muted rounded-full overflow-hidden">
+      <div className="w-30 h-0.5 bg-muted rounded-full overflow-hidden">
         <motion.div
           initial={{ x: "-100%" }}
           animate={{ x: "100%" }}

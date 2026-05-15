@@ -48,7 +48,7 @@ type DashboardProps = {
 };
 
 const Dashboard = ({ onNavigate }: DashboardProps) => (
-  <div className="p-6 pt-7 max-w-[1100px]">
+  <div className="p-6 pt-7 max-w-275">
     <div className="flex items-center justify-between mb-7">
       <div>
         <div className="text-muted-foreground text-sm mb-0.5">Quinta-feira, 14 de maio de 2026</div>
@@ -72,8 +72,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => (
       className="bg-card border border-border rounded-2xl p-7 mb-5 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #18181b 0%, #1e1030 60%, #18181b 100%)' }}
     >
-      <div className="absolute -top-12 -right-12 w-[220px] h-[220px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.18)_0%,transparent_70%)]" />
-      <div className="absolute -bottom-8 left-[100px] w-[140px] h-[140px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(191,160,113,0.08)_0%,transparent_70%)]" />
+      <div className="absolute -top-12 -right-12 w-55 h-55 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.18)_0%,transparent_70%)]" />
+      <div className="absolute -bottom-8 left-25 w-35 h-35 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(191,160,113,0.08)_0%,transparent_70%)]" />
       <div className="text-muted-foreground text-xs tracking-[1.5px] mb-2.5">PATRIMÔNIO LÍQUIDO TOTAL</div>
       <div className="text-gold text-5xl font-extrabold tracking-tight mb-3 leading-none">$124.850,00</div>
       <div className="flex items-center gap-2.5 flex-wrap">

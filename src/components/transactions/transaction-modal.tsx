@@ -146,7 +146,7 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
             <div className="text-center px-6 pb-7 border-b border-border">
               <div className="text-zinc-600 text-xs tracking-[1px] mb-2">VALOR</div>
               <div
-                className="text-5xl font-extrabold tracking-tight leading-none mb-1.5 min-h-[52px] transition-colors duration-200"
+                className="text-5xl font-extrabold tracking-tight leading-none mb-1.5 min-h-13 transition-colors duration-200"
                 style={{
                   color: txType === 'income' ? '#10B981' : txType === 'transfer' ? '#BFA071' : '#fafafa',
                 }}

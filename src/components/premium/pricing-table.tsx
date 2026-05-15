@@ -48,7 +48,7 @@ const testimonials = [
 ];
 
 const PricingTable = () => (
-  <div className="p-6 pt-7 max-w-[960px]">
+  <div className="p-6 pt-7 max-w-240">
     <div className="text-center mb-12">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -72,7 +72,7 @@ const PricingTable = () => (
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="text-muted-foreground text-base max-w-[480px] mx-auto"
+        className="text-muted-foreground text-base max-w-120 mx-auto"
       >
         Assine o Pro e desbloqueie insights com IA, carteiras ilimitadas e
         análises avançadas.
@@ -159,7 +159,7 @@ const PricingTable = () => (
               "linear-gradient(145deg, rgba(191,160,113,0.04) 0%, rgba(124,58,237,0.04) 100%)",
           }}
         />
-        <div className="absolute -top-10 -right-10 w-[180px] h-[180px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.12)_0%,transparent_70%)]" />
+        <div className="absolute -top-10 -right-10 w-45 h-45 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(124,58,237,0.12)_0%,transparent_70%)]" />
 
         <div className="absolute top-5 right-5 bg-gold text-background text-[10px] font-extrabold px-2.5 py-1 rounded-full tracking-wide">
           MAIS POPULAR
@@ -258,7 +258,7 @@ const PricingTable = () => (
       <h3 className="text-foreground mb-2 font-semibold">
         Garantia de devolução em 30 dias
       </h3>
-      <p className="text-muted-foreground text-sm mx-auto max-w-[400px]">
+      <p className="text-muted-foreground text-sm mx-auto max-w-100">
         Experimente o Nummus Pro sem risco por 30 dias. Se não ficar
         completamente satisfeito, devolvemos seu pagamento — sem perguntas.
       </p>
