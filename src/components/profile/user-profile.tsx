@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import {
   Bell,
   Camera,
@@ -16,8 +16,9 @@ import {
   Shield,
   Smartphone,
   User,
-} from "lucide-react";
-import { motion } from "motion/react";
+} from "lucide-react"
+import { motion } from "motion/react"
+import { useSession } from "@/lib/auth-client"
 
 type UserProfileProps = {
   onLogout: () => void;
@@ -90,7 +91,24 @@ const quickLinks = [
   { label: "Ajuda e Suporte", icon: HelpCircle, color: "#71717a" },
 ];
 
-const UserProfile = ({ onLogout }: UserProfileProps) => (
+const UserProfile = ({ onLogout }: UserProfileProps) => {
+  const { data: sessionData } = useSession()
+  const userName = sessionData?.user?.name ?? "Usuário"
+  const userEmail = sessionData?.user?.email ?? ""
+  const userInitials = userName
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+  const memberSince = sessionData?.user?.createdAt
+    ? new Date(sessionData.user.createdAt).toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      })
+    : ""
+
+  return (
   <div className="p-6 pt-7 max-w-180">
     <h1 className="text-foreground m-0 mb-7 tracking-tight text-2xl font-bold">
       Perfil e Configurações
@@ -111,7 +129,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
           className="w-18 h-18 rounded-full flex items-center justify-center text-[26px] text-foreground font-extrabold border-[3px] border-muted shrink-0"
           style={{ background: "linear-gradient(135deg, #7C3AED, #5B21B6)" }}
         >
-          AJ
+          {userInitials}
         </div>
         <Button
           variant="secondary"
@@ -124,10 +142,10 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
 
       <div className="flex-1">
         <div className="text-foreground font-bold text-lg tracking-tight mb-0.5">
-          Alex Johnson
+          {userName}
         </div>
         <div className="text-muted-foreground text-sm mb-2.5">
-          alex@exemplo.com
+          {userEmail}
         </div>
         <div className="inline-flex items-center gap-1.5 bg-gold/10 border border-gold/30 rounded-full px-3 py-1">
           <Crown size={12} className="text-gold" />
@@ -137,10 +155,12 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
         </div>
       </div>
 
-      <div className="text-right hidden sm:block">
-        <div className="text-zinc-600 text-xs mb-0.5">Membro desde</div>
-        <div className="text-zinc-400 text-sm">Janeiro de 2025</div>
-      </div>
+      {memberSince && (
+        <div className="text-right hidden sm:block">
+          <div className="text-zinc-600 text-xs mb-0.5">Membro desde</div>
+          <div className="text-zinc-400 text-sm capitalize">{memberSince}</div>
+        </div>
+      )}
     </motion.div>
 
     <motion.div
@@ -276,6 +296,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => (
       </div>
     </motion.div>
   </div>
-);
+  )
+}
 
-export default UserProfile;
+export default UserProfile

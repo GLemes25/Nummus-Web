@@ -1,0 +1,65 @@
+export type Wallet = {
+  id: string
+  name: string
+  currency: string
+  initialBalance: number
+  balance: number
+  isArchived: boolean
+  userId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type Category = {
+  id: string
+  name: string
+  color: string
+  icon: string
+  parentId: string | null
+  userId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type TransactionType = "INCOME" | "EXPENSE" | "BALANCE_ADJUSTMENT"
+export type PaymentMethod = "CASH" | "PIX" | "BANK_TRANSFER" | "DEBIT_CARD" | "CREDIT_CARD"
+export type TransactionStatus = "PENDING" | "COMPLETED" | "CANCELLED"
+
+export type Transaction = {
+  id: string
+  amount: number
+  type: TransactionType
+  paymentMethod: PaymentMethod
+  status: TransactionStatus
+  date: string
+  description: string
+  walletId: string | null
+  creditCardId: string | null
+  categoryId: string
+  userId: string
+  createdAt: string
+  updatedAt: string
+  category: {
+    id: string
+    name: string
+    color: string
+    icon: string
+  }
+  wallet: {
+    id: string
+    name: string
+    currency: string
+  } | null
+}
+
+export type TransactionsMeta = {
+  totalCount: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type TransactionsResponse = {
+  data: Transaction[]
+  meta: TransactionsMeta
+}
