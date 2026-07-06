@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 
 const SplashScreen = () => (
   <div className="bg-background h-screen w-screen flex flex-col items-center justify-center gap-7 relative overflow-hidden">
@@ -17,19 +18,16 @@ const SplashScreen = () => (
         stiffness: 180,
         damping: 18,
       }}
-      className="w-22 h-22 rounded-[22px] flex items-center justify-center"
+      className="w-50 h-50 rounded-[22px] flex items-center justify-center "
       style={{
-        width: 88,
-        height: 88,
-        background:
-          "linear-gradient(145deg, #BFA071 0%, #9A7A4A 60%, #6B5030 100%)",
+        width: 120,
+        height: 120,
+        backgroundColor: "#000",
         boxShadow:
           "0 0 0 1px rgba(191,160,113,0.3), 0 8px 32px rgba(191,160,113,0.25), 0 0 60px rgba(191,160,113,0.12)",
       }}
     >
-      <span className="text-background font-extrabold text-[40px] tracking-[-2px] leading-none">
-        N
-      </span>
+      <Image src="/Icon_square.png" alt="Logo" width={300} height={300} />
     </motion.div>
 
     <motion.div

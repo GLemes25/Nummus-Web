@@ -1,15 +1,23 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion } from 'motion/react';
-import { LayoutDashboard, CreditCard, Wallet, Crown, User, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { AppView } from '@/types/app';
-import Dashboard from '@/components/dashboard/dashboard';
-import Transactions from '@/components/transactions/transactions';
-import Wallets from '@/components/wallets/wallets';
-import PricingTable from '@/components/premium/pricing-table';
-import UserProfile from '@/components/profile/user-profile';
-import TransactionModal from '@/components/transactions/transaction-modal';
+import Dashboard from "@/components/dashboard/dashboard";
+import PricingTable from "@/components/premium/pricing-table";
+import UserProfile from "@/components/profile/user-profile";
+import TransactionModal from "@/components/transactions/transaction-modal";
+import Transactions from "@/components/transactions/transactions";
+import { Button } from "@/components/ui/button";
+import Wallets from "@/components/wallets/wallets";
+import type { AppView } from "@/types/app";
+import {
+  CreditCard,
+  Crown,
+  LayoutDashboard,
+  Plus,
+  User,
+  Wallet,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
 
 type AppLayoutProps = {
   currentView: AppView;
@@ -27,11 +35,11 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
-  { id: 'transactions', label: 'Transações', icon: CreditCard },
-  { id: 'wallets', label: 'Carteiras', icon: Wallet },
-  { id: 'premium', label: 'Premium', icon: Crown, badge: 'PRO' },
-  { id: 'profile', label: 'Perfil', icon: User },
+  { id: "dashboard", label: "Painel", icon: LayoutDashboard },
+  { id: "transactions", label: "Transações", icon: CreditCard },
+  { id: "wallets", label: "Carteiras", icon: Wallet },
+  { id: "premium", label: "Premium", icon: Crown, badge: "PRO" },
+  { id: "profile", label: "Perfil", icon: User },
 ];
 
 const AppLayout = ({
@@ -45,12 +53,14 @@ const AppLayout = ({
     <aside className="hidden lg:flex flex-col fixed h-screen w-60 border-r border-border bg-card z-20 shrink-0">
       <div className="px-5 pt-6 pb-5 border-b border-zinc-900">
         <div className="flex items-center gap-3">
-          <div className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(145deg, #BFA071, #8B6A40)', boxShadow: '0 4px 10px rgba(191,160,113,0.25)' }}>
-            <span className="text-background font-extrabold text-[17px] leading-none">N</span>
-          </div>
+          <Image src="/Icon.svg" alt="Logo" width={60} height={60} />
           <div>
-            <div className="text-foreground font-bold text-sm tracking-tight">Nummus</div>
-            <div className="text-gold text-[9px] tracking-[2px] mt-0.5">PREMIUM</div>
+            <div className="text-foreground font-bold text-sm tracking-tight">
+              Nummus
+            </div>
+            <div className="text-gold text-[9px] tracking-[2px] mt-0.5">
+              PREMIUM
+            </div>
           </div>
         </div>
       </div>
@@ -65,13 +75,13 @@ const AppLayout = ({
               variant="ghost"
               className={`w-full justify-start gap-3 px-3 py-2.5 h-auto rounded-lg relative text-sm font-normal ${
                 isActive
-                  ? 'bg-brand/10 text-brand hover:bg-brand/15 font-medium'
-                  : 'text-muted-foreground hover:bg-foreground/4 hover:text-foreground'
+                  ? "bg-brand/10 text-brand hover:bg-brand/15 font-medium"
+                  : "text-muted-foreground hover:bg-foreground/4 hover:text-foreground"
               }`}
               onClick={() => onNavigate(item.id)}
             >
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-brand rounded-r-[2px]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75 h-4.5 bg-brand rounded-r-xs" />
               )}
               <Icon size={17} />
               <span className="flex-1 text-left">{item.label}</span>
@@ -88,7 +98,10 @@ const AppLayout = ({
       <div className="px-2.5 py-4 border-t border-zinc-900">
         <Button
           className="w-full gap-2 text-foreground"
-          style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 4px 12px rgba(124,58,237,0.35)' }}
+          style={{
+            background: "linear-gradient(135deg, #7C3AED, #6D28D9)",
+            boxShadow: "0 4px 12px rgba(124,58,237,0.35)",
+          }}
           onClick={() => onToggleTransactionModal(true)}
         >
           <Plus size={16} />
@@ -107,15 +120,20 @@ const AppLayout = ({
           transition={{ duration: 0.18 }}
           className="min-h-screen"
         >
-          {currentView === 'dashboard' && (
-            <Dashboard onNewTransaction={() => onToggleTransactionModal(true)} onNavigate={onNavigate} />
+          {currentView === "dashboard" && (
+            <Dashboard
+              onNewTransaction={() => onToggleTransactionModal(true)}
+              onNavigate={onNavigate}
+            />
           )}
-          {currentView === 'transactions' && (
-            <Transactions onNewTransaction={() => onToggleTransactionModal(true)} />
+          {currentView === "transactions" && (
+            <Transactions
+              onNewTransaction={() => onToggleTransactionModal(true)}
+            />
           )}
-          {currentView === 'wallets' && <Wallets />}
-          {currentView === 'premium' && <PricingTable />}
-          {currentView === 'profile' && <UserProfile onLogout={onLogout} />}
+          {currentView === "wallets" && <Wallets />}
+          {currentView === "premium" && <PricingTable />}
+          {currentView === "profile" && <UserProfile onLogout={onLogout} />}
         </motion.div>
       </AnimatePresence>
     </main>
@@ -128,20 +146,25 @@ const AppLayout = ({
           <Button
             key={item.id}
             variant="ghost"
-            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? 'text-brand' : 'text-zinc-600'}`}
+            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
             onClick={() => onNavigate(item.id)}
           >
             <Icon size={22} />
-            <span className={`text-[10px] ${isActive ? 'font-medium' : 'font-normal'}`}>{item.label}</span>
+            <span
+              className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+            >
+              {item.label}
+            </span>
           </Button>
         );
       })}
 
       <Button
-        className="w-[54px] h-[54px] rounded-full p-0 shrink-0 mb-1"
+        className="w-13.5 h-13.5 rounded-full p-0 shrink-0 mb-1"
         style={{
-          background: 'linear-gradient(145deg, #7C3AED, #6D28D9)',
-          boxShadow: '0 4px 20px rgba(124,58,237,0.55), 0 0 0 6px rgba(124,58,237,0.08)',
+          background: "linear-gradient(145deg, #7C3AED, #6D28D9)",
+          boxShadow:
+            "0 4px 20px rgba(124,58,237,0.55), 0 0 0 6px rgba(124,58,237,0.08)",
         }}
         onClick={() => onToggleTransactionModal(true)}
       >
@@ -155,17 +178,24 @@ const AppLayout = ({
           <Button
             key={item.id}
             variant="ghost"
-            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? 'text-brand' : 'text-zinc-600'}`}
+            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
             onClick={() => onNavigate(item.id)}
           >
             <Icon size={22} />
-            <span className={`text-[10px] ${isActive ? 'font-medium' : 'font-normal'}`}>{item.label}</span>
+            <span
+              className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+            >
+              {item.label}
+            </span>
           </Button>
         );
       })}
     </div>
 
-    <TransactionModal isOpen={showTransactionModal} onClose={() => onToggleTransactionModal(false)} />
+    <TransactionModal
+      isOpen={showTransactionModal}
+      onClose={() => onToggleTransactionModal(false)}
+    />
   </div>
 );
 
