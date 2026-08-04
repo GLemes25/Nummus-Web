@@ -5,8 +5,26 @@ import { motion } from 'motion/react';
 import { Plus, MoreHorizontal, Wallet as WalletIcon, Edit3, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useWallets } from '@/hooks/use-wallets';
 import AddWalletModal from '@/components/wallets/add-wallet-modal';
+import EditWalletModal from '@/components/wallets/edit-wallet-modal';
+import type { Wallet } from '@/types/api';
 
 const walletGradients = [
   'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
@@ -34,7 +52,19 @@ const categoryData = [
 const Wallets = () => {
   const [activeTab, setActiveTab] = useState<'wallets' | 'categories'>('wallets');
   const [isAddWalletOpen, setIsAddWalletOpen] = useState(false);
-  const { wallets, isLoading, error, createWallet, isCreating } = useWallets();
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const [deletingWallet, setDeletingWallet] = useState<Wallet | null>(null);
+  const {
+    wallets,
+    isLoading,
+    error,
+    createWallet,
+    isCreating,
+    updateWallet,
+    isUpdating,
+    deleteWallet,
+    isDeleting,
+  } = useWallets();
 
   const totalAssets = wallets.filter((w) => w.balance > 0).reduce((s, w) => s + w.balance, 0);
   const totalLiabilities = wallets.filter((w) => w.balance < 0).reduce((s, w) => s + Math.abs(w.balance), 0);
@@ -112,9 +142,32 @@ const Wallets = () => {
                     <div className="w-[38px] h-[38px] rounded-[10px] bg-white/15 flex items-center justify-center">
                       <WalletIcon size={18} color="rgba(255,255,255,0.9)" />
                     </div>
-                    <Button variant="ghost" size="icon" className="w-[30px] h-[30px] rounded-[7px] bg-black/20 text-white/70 hover:bg-black/30 hover:text-white">
-                      <MoreHorizontal size={14} />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-[30px] h-[30px] rounded-[7px] bg-black/20 text-white/70 hover:bg-black/30 hover:text-white"
+                          >
+                            <MoreHorizontal size={14} />
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => setEditingWallet(wallet)}>
+                          <Edit3 size={14} />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => setDeletingWallet(wallet)}
+                        >
+                          <Trash2 size={14} />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   <div>
@@ -189,6 +242,43 @@ const Wallets = () => {
         onCreateWallet={createWallet}
         isCreating={isCreating}
       />
+
+      <EditWalletModal
+        isOpen={!!editingWallet}
+        onClose={() => setEditingWallet(null)}
+        wallet={editingWallet}
+        onUpdateWallet={updateWallet}
+        isUpdating={isUpdating}
+      />
+
+      <AlertDialog
+        open={!!deletingWallet}
+        onOpenChange={(open: boolean) => {
+          if (!open) setDeletingWallet(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir carteira</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a carteira &quot;{deletingWallet?.name}&quot;? Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={async () => {
+                if (!deletingWallet) return;
+                await deleteWallet(deletingWallet.id);
+                setDeletingWallet(null);
+              }}
+            >
+              {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
