@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { X, Calendar, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import { apiClient } from '@/lib/api-client'
 import { useWallets } from '@/hooks/use-wallets'
 import { useCategories } from '@/hooks/use-categories'
@@ -275,7 +276,7 @@ const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
                               : '#1f1f22',
                         }}
                       >
-                        <span className="text-[18px]">{cat.icon}</span>
+                        <DynamicIcon name={cat.icon} size={18} />
                         <span
                           className="text-[10px] text-center leading-tight"
                           style={{
