@@ -2,27 +2,18 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, MoreHorizontal, CreditCard, Banknote, PiggyBank, TrendingUp, Edit3, Trash2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Wallet as WalletIcon, Edit3, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useWallets } from '@/hooks/use-wallets';
+import AddWalletModal from '@/components/wallets/add-wallet-modal';
 
-type WalletEntry = {
-  id: number;
-  name: string;
-  type: string;
-  balance: number;
-  masked: string;
-  color: string;
-  gradient: string;
-  icon: React.ElementType;
-};
-
-const walletData: WalletEntry[] = [
-  { id: 1, name: 'Chase Checking', type: 'bank', balance: 8420.5, masked: '••••  4231', color: '#7C3AED', gradient: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)', icon: CreditCard },
-  { id: 2, name: 'Conta Poupança', type: 'savings', balance: 32600.0, masked: '••••  8804', color: '#10B981', gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)', icon: PiggyBank },
-  { id: 3, name: 'Chase Visa', type: 'credit', balance: -2340.78, masked: '••••  1792', color: '#F43F5E', gradient: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)', icon: CreditCard },
-  { id: 4, name: 'Carteira de Investimentos', type: 'investment', balance: 84290.0, masked: 'Fidelity', color: '#BFA071', gradient: 'linear-gradient(135deg, #BFA071 0%, #8B6A40 100%)', icon: TrendingUp },
-  { id: 5, name: 'Carteira de Dinheiro', type: 'cash', balance: 340.0, masked: 'Físico', color: '#06B6D4', gradient: 'linear-gradient(135deg, #0891B2 0%, #0E7490 100%)', icon: Banknote },
+const walletGradients = [
+  'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
+  'linear-gradient(135deg, #059669 0%, #047857 100%)',
+  'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
+  'linear-gradient(135deg, #BFA071 0%, #8B6A40 100%)',
+  'linear-gradient(135deg, #0891B2 0%, #0E7490 100%)',
 ];
 
 const categoryData = [
@@ -42,9 +33,11 @@ const categoryData = [
 
 const Wallets = () => {
   const [activeTab, setActiveTab] = useState<'wallets' | 'categories'>('wallets');
+  const [isAddWalletOpen, setIsAddWalletOpen] = useState(false);
+  const { wallets, isLoading, error, createWallet, isCreating } = useWallets();
 
-  const totalAssets = walletData.filter((w) => w.balance > 0).reduce((s, w) => s + w.balance, 0);
-  const totalLiabilities = walletData.filter((w) => w.balance < 0).reduce((s, w) => s + Math.abs(w.balance), 0);
+  const totalAssets = wallets.filter((w) => w.balance > 0).reduce((s, w) => s + w.balance, 0);
+  const totalLiabilities = wallets.filter((w) => w.balance < 0).reduce((s, w) => s + Math.abs(w.balance), 0);
   const netWorth = totalAssets - totalLiabilities;
 
   return (
@@ -58,7 +51,10 @@ const Wallets = () => {
             {activeTab === 'wallets' ? 'Gerencie suas contas e saldos' : 'Organize suas transações'}
           </p>
         </div>
-        <Button className="bg-brand text-brand-foreground hover:bg-brand/90 gap-1.5">
+        <Button
+          className="bg-brand text-brand-foreground hover:bg-brand/90 gap-1.5"
+          onClick={activeTab === 'wallets' ? () => setIsAddWalletOpen(true) : undefined}
+        >
           <Plus size={15} />
           {activeTab === 'wallets' ? 'Adicionar Carteira' : 'Adicionar Categoria'}
         </Button>
@@ -92,24 +88,29 @@ const Wallets = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {walletData.map((wallet, i) => {
-              const Icon = wallet.icon;
-              return (
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={20} className="animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? (
+            <p className="text-expense text-sm text-center py-12">{error}</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {wallets.map((wallet, i) => (
                 <motion.div
                   key={wallet.id}
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
                   className="rounded-2xl p-[22px] relative overflow-hidden cursor-pointer min-h-40 flex flex-col justify-between"
-                  style={{ background: wallet.gradient }}
+                  style={{ background: walletGradients[i % walletGradients.length] }}
                 >
                   <div className="absolute -top-8 -right-8 w-30 h-30 rounded-full bg-white/8 pointer-events-none" />
                   <div className="absolute -bottom-5 -left-5 w-25 h-25 rounded-full bg-black/10 pointer-events-none" />
 
                   <div className="flex justify-between items-start">
                     <div className="w-[38px] h-[38px] rounded-[10px] bg-white/15 flex items-center justify-center">
-                      <Icon size={18} color="rgba(255,255,255,0.9)" />
+                      <WalletIcon size={18} color="rgba(255,255,255,0.9)" />
                     </div>
                     <Button variant="ghost" size="icon" className="w-[30px] h-[30px] rounded-[7px] bg-black/20 text-white/70 hover:bg-black/30 hover:text-white">
                       <MoreHorizontal size={14} />
@@ -121,22 +122,23 @@ const Wallets = () => {
                     <div className="text-white font-extrabold text-[22px] tracking-tight mb-1.5">
                       {wallet.balance < 0 ? '-' : ''}${Math.abs(wallet.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="text-white/50 text-xs tracking-wide">{wallet.masked}</div>
+                    <div className="text-white/50 text-xs tracking-wide">{wallet.currency}</div>
                   </div>
                 </motion.div>
-              );
-            })}
+              ))}
 
-            <motion.button
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: walletData.length * 0.06 }}
-              className="rounded-2xl border-2 border-dashed border-border bg-transparent p-[22px] flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-40 text-zinc-600 transition-colors hover:border-brand hover:text-brand"
-            >
-              <Plus size={24} />
-              <span className="text-sm">Adicionar Carteira</span>
-            </motion.button>
-          </div>
+              <motion.button
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: wallets.length * 0.06 }}
+                onClick={() => setIsAddWalletOpen(true)}
+                className="rounded-2xl border-2 border-dashed border-border bg-transparent p-[22px] flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-40 text-zinc-600 transition-colors hover:border-brand hover:text-brand"
+              >
+                <Plus size={24} />
+                <span className="text-sm">Adicionar Carteira</span>
+              </motion.button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="categories">
@@ -180,6 +182,13 @@ const Wallets = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AddWalletModal
+        isOpen={isAddWalletOpen}
+        onClose={() => setIsAddWalletOpen(false)}
+        onCreateWallet={createWallet}
+        isCreating={isCreating}
+      />
     </div>
   );
 };
