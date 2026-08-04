@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DropdownMenu as DropdownMenuPrimitive } from "@base-ui/react/dropdown-menu"
+import { Menu as DropdownMenuPrimitive } from "@base-ui/react/menu"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
