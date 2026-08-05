@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet2, Bell, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import CustomTooltip from '@/components/dashboard/custom-tooltip'
 import { useWallets } from '@/hooks/use-wallets'
 import { useTransactions } from '@/hooks/use-transactions'
@@ -357,13 +358,13 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
                 }}
               >
                 <div
-                  className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center text-[19px] mr-3.5 shrink-0"
+                  className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
                   style={{
                     backgroundColor: tx.category.color + '22',
                     border: `1px solid ${tx.category.color}44`,
                   }}
                 >
-                  {tx.category.icon}
+                  <DynamicIcon name={tx.category.icon} size={19} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-foreground text-sm font-medium mb-0.5 truncate">
