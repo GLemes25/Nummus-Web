@@ -81,7 +81,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   })
 
   return (
-    <div className="p-6 pt-7 max-w-275">
+    <div className="p-6 pt-7 w-full max-w-275 mx-auto">
       <div className="flex items-center justify-between mb-7">
         <div>
           <div className="text-muted-foreground text-sm mb-0.5 capitalize">{today}</div>

@@ -109,7 +109,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => {
     : ""
 
   return (
-  <div className="p-6 pt-7 max-w-180">
+  <div className="p-6 pt-7 w-full max-w-180 mx-auto">
     <h1 className="text-foreground m-0 mb-7 tracking-tight text-2xl font-bold">
       Perfil e Configurações
     </h1>

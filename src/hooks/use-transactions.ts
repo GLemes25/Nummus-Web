@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { apiClient } from "@/lib/api-client"
-import type { Transaction, TransactionsMeta, TransactionType } from "@/types/api"
+import type { PaymentMethod, Transaction, TransactionsMeta, TransactionType } from "@/types/api"
 
 type FetchParams = {
   page?: number
@@ -12,12 +12,23 @@ type FetchParams = {
   enabled?: boolean
 }
 
+export type UpdateTransactionInput = {
+  amount: number
+  type: "INCOME" | "EXPENSE"
+  paymentMethod: PaymentMethod
+  description: string
+  walletId: string
+  categoryId: string
+  date: string
+}
+
 export const useTransactions = (params: FetchParams = {}) => {
   const isEnabled = params.enabled ?? true
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [meta, setMeta] = useState<TransactionsMeta | null>(null)
   const [isLoading, setIsLoading] = useState(isEnabled)
   const [error, setError] = useState<string | null>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const fetchTransactions = useCallback(async () => {
     if (!isEnabled) return
@@ -61,9 +72,35 @@ export const useTransactions = (params: FetchParams = {}) => {
     [fetchTransactions]
   )
 
+  const updateTransaction = useCallback(
+    async (id: string, input: UpdateTransactionInput): Promise<boolean> => {
+      setIsUpdating(true)
+      try {
+        const res = await apiClient.patch(`/transactions/${id}`, input)
+        if (!res || !res.ok) return false
+        await fetchTransactions()
+        return true
+      } catch {
+        return false
+      } finally {
+        setIsUpdating(false)
+      }
+    },
+    [fetchTransactions]
+  )
+
   useEffect(() => {
     fetchTransactions()
   }, [fetchTransactions])
 
-  return { transactions, meta, isLoading, error, refetch: fetchTransactions, deleteTransaction }
+  return {
+    transactions,
+    meta,
+    isLoading,
+    error,
+    refetch: fetchTransactions,
+    deleteTransaction,
+    updateTransaction,
+    isUpdating,
+  }
 }

@@ -2,10 +2,27 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, Trash2, Loader2 } from 'lucide-react'
+import { Search, Trash2, Edit3, MoreHorizontal, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import EditTransactionModal from '@/components/transactions/edit-transaction-modal'
 import { useTransactions } from '@/hooks/use-transactions'
 import type { Transaction } from '@/types/api'
 
@@ -53,9 +70,12 @@ type TransactionsProps = {
 const Transactions = ({ onNewTransaction }: TransactionsProps) => {
   const [filter, setFilter] = useState<'all' | 'INCOME' | 'EXPENSE' | 'BALANCE_ADJUSTMENT'>('all')
   const [search, setSearch] = useState('')
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const { transactions, meta, isLoading, deleteTransaction } = useTransactions({ limit: 50 })
+  const { transactions, meta, isLoading, deleteTransaction, updateTransaction, isUpdating } =
+    useTransactions({ limit: 50 })
 
   const filtered = transactions.filter((tx) => {
     const matchType = filter === 'all' || tx.type === filter
@@ -74,14 +94,8 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
     .filter((t) => t.type === 'EXPENSE')
     .reduce((s, t) => s + t.amount, 0)
 
-  const handleDelete = async (id: string) => {
-    setDeletingId(id)
-    await deleteTransaction(id)
-    setDeletingId(null)
-  }
-
   return (
-    <div className="p-6 pt-7 max-w-200">
+    <div className="p-6 pt-7 w-full max-w-200 mx-auto">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">Transações</h1>
@@ -203,19 +217,32 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                         </div>
                         <div className="text-zinc-700 text-xs mt-0.5">{typeLabels[tx.type]}</div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="ml-2 shrink-0 w-8 h-8 text-zinc-600 hover:text-expense hover:bg-expense/10"
-                        disabled={deletingId === tx.id}
-                        onClick={() => handleDelete(tx.id)}
-                      >
-                        {deletingId === tx.id ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Trash2 size={14} />
-                        )}
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="ml-2 shrink-0 w-8 h-8 text-zinc-600 hover:text-foreground"
+                            >
+                              <MoreHorizontal size={14} />
+                            </Button>
+                          }
+                        />
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => setEditingTransaction(tx)}>
+                            <Edit3 size={14} />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setDeletingTransaction(tx)}
+                          >
+                            <Trash2 size={14} />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   ))}
                 </div>
@@ -224,6 +251,46 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
           )}
         </AnimatePresence>
       )}
+
+      <EditTransactionModal
+        isOpen={!!editingTransaction}
+        onClose={() => setEditingTransaction(null)}
+        transaction={editingTransaction}
+        onUpdateTransaction={updateTransaction}
+        isUpdating={isUpdating}
+      />
+
+      <AlertDialog
+        open={!!deletingTransaction}
+        onOpenChange={(open: boolean) => {
+          if (!open) setDeletingTransaction(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir transação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a transação &quot;{deletingTransaction?.description}
+              &quot;? Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={async () => {
+                if (!deletingTransaction) return
+                setIsDeleting(true)
+                await deleteTransaction(deletingTransaction.id)
+                setIsDeleting(false)
+                setDeletingTransaction(null)
+              }}
+            >
+              {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -95,7 +95,7 @@ const AppLayout = ({
         })}
       </nav>
 
-      <div className="px-2.5 py-4 border-t border-zinc-900">
+      <div className="px-2.5 pt-4 pb-8 border-t border-zinc-900">
         <Button
           className="w-full gap-2 text-foreground"
           style={{
