@@ -1,15 +1,21 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet2, Bell, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import CustomTooltip from '@/components/dashboard/custom-tooltip'
+import WalletDetailsSheet from '@/components/wallets/wallet-details-sheet'
+import TransactionTypeDetailsSheet from '@/components/transactions/transaction-type-details-sheet'
 import { useWallets } from '@/hooks/use-wallets'
 import { useTransactions } from '@/hooks/use-transactions'
 import { useSession } from '@/lib/auth-client'
 import type { AppView } from '@/types/app'
+import type { Wallet } from '@/types/api'
+
+type IncomeOrExpense = 'INCOME' | 'EXPENSE'
 
 const areaData = [
   { month: 'Dez', balance: 98200 },
@@ -41,6 +47,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   const { data: sessionData } = useSession()
   const { wallets, isLoading: isWalletsLoading } = useWallets()
   const { transactions, isLoading: isTransactionsLoading } = useTransactions({ limit: 5 })
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null)
+  const [selectedTxType, setSelectedTxType] = useState<IncomeOrExpense | null>(null)
 
   const userName = sessionData?.user?.name?.split(' ')[0] ?? 'Usuário'
   const userInitials = sessionData?.user?.name
@@ -137,7 +145,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 + i * 0.05 }}
-              className="bg-card border border-border rounded-xl p-4"
+              className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:bg-foreground/5 transition-colors"
+              onClick={() => setSelectedWallet(wallet)}
             >
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-lg bg-brand/15 flex items-center justify-center">
@@ -160,6 +169,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             value: `R$ ${formatCurrency(monthlyIncome)}`,
             change: 'este período',
             type: 'income',
+            txType: 'INCOME' as const,
             Icon: ArrowUpRight,
           },
           {
@@ -167,6 +177,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             value: `R$ ${formatCurrency(monthlyExpenses)}`,
             change: 'este período',
             type: 'expense',
+            txType: 'EXPENSE' as const,
             Icon: ArrowDownRight,
           },
           {
@@ -174,6 +185,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             value: `R$ ${formatCurrency(Math.max(savings, 0))}`,
             change: 'saldo do período',
             type: 'neutral',
+            txType: null,
             Icon: Wallet2,
           },
         ].map((stat, i) => (
@@ -182,7 +194,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + i * 0.06 }}
-            className="bg-card border border-border rounded-xl p-4 py-[18px]"
+            className={`bg-card border border-border rounded-xl p-4 py-[18px] ${stat.txType ? 'cursor-pointer hover:bg-foreground/5 transition-colors' : ''}`}
+            onClick={stat.txType ? () => setSelectedTxType(stat.txType) : undefined}
           >
             <div className="flex justify-between mb-2.5">
               <span className="text-muted-foreground text-sm">{stat.label}</span>
@@ -388,6 +401,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
           </div>
         )}
       </div>
+
+      <WalletDetailsSheet wallet={selectedWallet} onClose={() => setSelectedWallet(null)} />
+      <TransactionTypeDetailsSheet type={selectedTxType} onClose={() => setSelectedTxType(null)} />
     </div>
   )
 }
