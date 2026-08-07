@@ -10,12 +10,6 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   Form,
   FormControl,
   FormField,
@@ -32,65 +26,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import TransactionForm from '@/components/transactions/transaction-form'
 import { useCategories } from '@/hooks/use-categories'
-import { useTransactions } from '@/hooks/use-transactions'
 import { useWallets } from '@/hooks/use-wallets'
-import { apiClient } from '@/lib/api-client'
+import type { TransactionMutationResult } from '@/hooks/use-transactions'
 import { evaluateMathExpression } from '@/lib/evaluateMathExpression'
+import type { PaymentMethod } from '@/types/api'
 
-type TransactionModalProps = {
-  isOpen: boolean
-  onClose: () => void
-}
+const typeOptions = [
+  { value: 'EXPENSE', label: 'Despesa' },
+  { value: 'INCOME', label: 'Receita' },
+] as const
 
-type Mode = 'transaction' | 'transfer'
+const paymentMethodOptions: { value: PaymentMethod; label: string }[] = [
+  { value: 'PIX', label: 'Pix' },
+  { value: 'CASH', label: 'Dinheiro' },
+  { value: 'BANK_TRANSFER', label: 'Transferência' },
+  { value: 'DEBIT_CARD', label: 'Débito' },
+]
+
+const NO_CATEGORY = '__none__'
 
 const isPlainNumber = (value: string) => /^\d+(\.\d+)?$/.test(value.trim())
 
 const formatCurrency = (value: number) =>
   value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-const NO_CATEGORY = '__none__'
+const transactionFormSchema = z.object({
+  type: z.enum(['INCOME', 'EXPENSE']),
+  amount: z.string().min(1, 'Informe um valor').refine(
+    (raw) => {
+      const evaluated = evaluateMathExpression(raw)
+      return evaluated !== null && evaluated > 0
+    },
+    { message: 'Informe um valor válido' }
+  ),
+  categoryId: z.string().optional(),
+  description: z.string().min(1, 'Informe uma descrição'),
+  paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD']),
+  walletId: z.string().min(1, 'Selecione uma carteira'),
+  date: z.date({ error: 'Selecione uma data válida' }),
+})
 
-const transferFormSchema = z
-  .object({
-    sourceWalletId: z.string().min(1, 'Selecione a carteira de origem'),
-    destinationWalletId: z.string().min(1, 'Selecione a carteira de destino'),
-    amount: z.string().min(1, 'Informe um valor').refine(
-      (raw) => {
-        const evaluated = evaluateMathExpression(raw)
-        return evaluated !== null && evaluated > 0
-      },
-      { message: 'Informe um valor válido' }
-    ),
-    categoryId: z.string().optional(),
-    description: z.string().optional(),
-    date: z.date({ error: 'Selecione uma data válida' }),
-  })
-  .refine((data) => data.sourceWalletId !== data.destinationWalletId, {
-    message: 'A carteira de origem e destino devem ser diferentes',
-    path: ['destinationWalletId'],
-  })
+export type TransactionFormValues = z.infer<typeof transactionFormSchema>
+export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & { amount: number }
 
-type TransferFormValues = z.infer<typeof transferFormSchema>
+type TransactionFormProps = {
+  defaultValues?: Partial<TransactionFormValues>
+  onSubmit: (values: TransactionFormSubmitValues) => Promise<TransactionMutationResult>
+  onSuccess: () => void
+  isSubmitting: boolean
+  submitLabel: string
+}
 
-const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+const TransactionForm = ({
+  defaultValues,
+  onSubmit,
+  onSuccess,
+  isSubmitting,
+  submitLabel,
+}: TransactionFormProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const { wallets } = useWallets()
   const { categories } = useCategories()
 
-  const form = useForm<TransferFormValues>({
-    resolver: zodResolver(transferFormSchema),
+  const form = useForm<TransactionFormValues>({
+    resolver: zodResolver(transactionFormSchema),
     defaultValues: {
-      sourceWalletId: wallets[0]?.id ?? '',
-      destinationWalletId: wallets[1]?.id ?? wallets[0]?.id ?? '',
+      type: 'EXPENSE',
       amount: '',
       categoryId: undefined,
       description: '',
+      paymentMethod: 'PIX',
+      walletId: wallets[0]?.id ?? '',
       date: new Date(),
+      ...defaultValues,
     },
   })
 
@@ -100,40 +110,57 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
     return evaluateMathExpression(rawAmount)
   }, [rawAmount])
 
-  const handleSubmit = async (values: TransferFormValues) => {
+  const handleSubmit = async (values: TransactionFormValues) => {
+    setSubmitError(null)
     const amount = evaluateMathExpression(values.amount)
     if (amount === null) {
       setSubmitError('Informe um valor válido')
       return
     }
-
-    setIsSubmitting(true)
-    setSubmitError(null)
-    try {
-      const res = await apiClient.post('/transfers', {
-        sourceWalletId: values.sourceWalletId,
-        destinationWalletId: values.destinationWalletId,
-        amount,
-        date: values.date.toISOString(),
-        description: values.description || undefined,
-        categoryId: values.categoryId,
-      })
-      if (!res || !res.ok) {
-        const data = res ? await res.json().catch(() => null) : null
-        setSubmitError(data?.error ?? 'Erro ao realizar transferência')
-        return
-      }
-      onSuccess()
-    } catch {
-      setSubmitError('Ocorreu um erro inesperado. Tente novamente.')
-    } finally {
-      setIsSubmitting(false)
+    const result = await onSubmit({ ...values, amount })
+    if (!result.success) {
+      setSubmitError(result.error ?? 'Ocorreu um erro inesperado. Tente novamente.')
+      return
     }
+    onSuccess()
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                TIPO
+              </FormLabel>
+              <div className="flex bg-zinc-900 rounded-xl p-0.5 border border-border gap-0.5">
+                {typeOptions.map((option) => {
+                  const isActive = field.value === option.value
+                  const activeClass =
+                    option.value === 'INCOME' ? 'bg-income/15 text-income' : 'bg-expense/15 text-expense'
+                  return (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant="ghost"
+                      onClick={() => field.onChange(option.value)}
+                      className={`flex-1 h-auto py-2 rounded-lg font-normal hover:bg-transparent ${
+                        isActive ? `${activeClass} font-semibold` : 'text-muted-foreground'
+                      }`}
+                    >
+                      {option.label}
+                    </Button>
+                  )
+                })}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="amount"
@@ -214,22 +241,22 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
         <FormField
           control={form.control}
-          name="sourceWalletId"
+          name="paymentMethod"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                CARTEIRA DE ORIGEM
+                FORMA DE PAGAMENTO
               </FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione a carteira" />
+                    <SelectValue placeholder="Selecione a forma de pagamento" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {wallets.map((wallet) => (
-                    <SelectItem key={wallet.id} value={wallet.id}>
-                      {wallet.name}
+                  {paymentMethodOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -241,11 +268,11 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
         <FormField
           control={form.control}
-          name="destinationWalletId"
+          name="walletId"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                CARTEIRA DE DESTINO
+                CARTEIRA
               </FormLabel>
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
@@ -311,73 +338,11 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
           disabled={isSubmitting}
           className="w-full mt-1 bg-brand text-brand-foreground hover:bg-brand/90 font-semibold text-[15px]"
         >
-          {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Realizar Transferência'}
+          {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
         </Button>
       </form>
     </Form>
   )
 }
 
-const TransactionModal = ({ isOpen, onClose }: TransactionModalProps) => {
-  const [mode, setMode] = useState<Mode>('transaction')
-  const { createTransaction, isCreating } = useTransactions()
-
-  const handleClose = () => {
-    setMode('transaction')
-    onClose()
-  }
-
-  return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open: boolean) => {
-        if (!open) handleClose()
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Nova Transação</DialogTitle>
-        </DialogHeader>
-
-        <div className="overflow-y-auto px-4 pb-4 flex flex-col gap-4">
-          <div className="flex bg-zinc-900 rounded-xl p-0.5 border border-border gap-0.5">
-            {(
-              [
-                { value: 'transaction', label: 'Transação' },
-                { value: 'transfer', label: 'Transferência' },
-              ] as const
-            ).map((option) => (
-              <Button
-                key={option.value}
-                type="button"
-                variant="ghost"
-                onClick={() => setMode(option.value)}
-                className={`flex-1 h-auto py-2 rounded-lg font-normal hover:bg-transparent ${
-                  mode === option.value
-                    ? 'bg-brand/15 text-brand font-semibold'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-
-          {mode === 'transaction' ? (
-            <TransactionForm
-              key="transaction"
-              isSubmitting={isCreating}
-              submitLabel="Salvar Transação"
-              onSubmit={(values) => createTransaction({ ...values, date: values.date.toISOString() })}
-              onSuccess={handleClose}
-            />
-          ) : (
-            <TransferForm key="transfer" onSuccess={handleClose} />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-export default TransactionModal
+export default TransactionForm

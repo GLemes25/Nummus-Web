@@ -12,15 +12,19 @@ type FetchParams = {
   enabled?: boolean
 }
 
-export type UpdateTransactionInput = {
+export type CreateTransactionInput = {
   amount: number
   type: "INCOME" | "EXPENSE"
   paymentMethod: PaymentMethod
   description: string
   walletId: string
-  categoryId: string
+  categoryId?: string
   date: string
 }
+
+export type UpdateTransactionInput = CreateTransactionInput
+
+export type TransactionMutationResult = { success: true } | { success: false; error: string }
 
 export const useTransactions = (params: FetchParams = {}) => {
   const isEnabled = params.enabled ?? true
@@ -29,6 +33,7 @@ export const useTransactions = (params: FetchParams = {}) => {
   const [isLoading, setIsLoading] = useState(isEnabled)
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
 
   const fetchTransactions = useCallback(async () => {
     if (!isEnabled) return
@@ -73,17 +78,40 @@ export const useTransactions = (params: FetchParams = {}) => {
   )
 
   const updateTransaction = useCallback(
-    async (id: string, input: UpdateTransactionInput): Promise<boolean> => {
+    async (id: string, input: UpdateTransactionInput): Promise<TransactionMutationResult> => {
       setIsUpdating(true)
       try {
         const res = await apiClient.patch(`/transactions/${id}`, input)
-        if (!res || !res.ok) return false
+        if (!res || !res.ok) {
+          const data = res ? await res.json().catch(() => null) : null
+          return { success: false, error: data?.error ?? "Erro ao atualizar transação" }
+        }
         await fetchTransactions()
-        return true
+        return { success: true }
       } catch {
-        return false
+        return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
       } finally {
         setIsUpdating(false)
+      }
+    },
+    [fetchTransactions]
+  )
+
+  const createTransaction = useCallback(
+    async (input: CreateTransactionInput): Promise<TransactionMutationResult> => {
+      setIsCreating(true)
+      try {
+        const res = await apiClient.post("/transactions", input)
+        if (!res || !res.ok) {
+          const data = res ? await res.json().catch(() => null) : null
+          return { success: false, error: data?.error ?? "Erro ao salvar transação" }
+        }
+        await fetchTransactions()
+        return { success: true }
+      } catch {
+        return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
+      } finally {
+        setIsCreating(false)
       }
     },
     [fetchTransactions]
@@ -102,5 +130,7 @@ export const useTransactions = (params: FetchParams = {}) => {
     deleteTransaction,
     updateTransaction,
     isUpdating,
+    createTransaction,
+    isCreating,
   }
 }
