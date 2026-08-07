@@ -71,7 +71,7 @@ const Wallets = () => {
   const netWorth = totalAssets - totalLiabilities;
 
   return (
-    <div className="p-6 pt-7 max-w-225">
+    <div className="p-6 pt-7 w-full max-w-225 mx-auto">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">

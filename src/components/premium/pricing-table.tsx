@@ -48,7 +48,7 @@ const testimonials = [
 ];
 
 const PricingTable = () => (
-  <div className="p-6 pt-7 max-w-240">
+  <div className="p-6 pt-7 w-full max-w-240 mx-auto">
     <div className="text-center mb-12">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
