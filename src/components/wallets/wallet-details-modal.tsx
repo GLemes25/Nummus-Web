@@ -2,57 +2,49 @@
 
 import { Loader2 } from 'lucide-react'
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import { useTransactions } from '@/hooks/use-transactions'
+import type { Wallet } from '@/types/api'
 
-type IncomeOrExpense = 'INCOME' | 'EXPENSE'
-
-type TransactionTypeDetailsSheetProps = {
-  type: IncomeOrExpense | null
+type WalletDetailsModalProps = {
+  wallet: Wallet | null
   onClose: () => void
-}
-
-const typeTitles: Record<IncomeOrExpense, string> = {
-  INCOME: 'Receitas',
-  EXPENSE: 'Despesas',
 }
 
 const formatCurrency = (value: number) =>
   value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-const TransactionTypeDetailsSheet = ({ type, onClose }: TransactionTypeDetailsSheetProps) => {
-  const isOpen = !!type
+const WalletDetailsModal = ({ wallet, onClose }: WalletDetailsModalProps) => {
+  const isOpen = !!wallet
 
   const { transactions, isLoading } = useTransactions({
-    type: type ?? undefined,
+    walletId: wallet?.id,
     limit: 50,
     enabled: isOpen,
   })
 
-  const total = transactions.reduce((sum, tx) => sum + tx.amount, 0)
-
   return (
-    <Sheet
+    <Dialog
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) onClose()
       }}
     >
-      <SheetContent className="w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{type ? typeTitles[type] : 'Transações'}</SheetTitle>
-          <SheetDescription>
-            {type
-              ? `${type === 'INCOME' ? '+' : '-'}R$ ${formatCurrency(total)} no total`
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{wallet?.name ?? 'Carteira'}</DialogTitle>
+          <DialogDescription>
+            {wallet
+              ? `${wallet.currency} ${formatCurrency(wallet.balance)} · histórico de transações`
               : ''}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           {isLoading ? (
@@ -61,7 +53,7 @@ const TransactionTypeDetailsSheet = ({ type, onClose }: TransactionTypeDetailsSh
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground text-sm">
-              Nenhuma transação encontrada
+              Nenhuma transação encontrada para esta carteira
             </div>
           ) : (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -88,8 +80,7 @@ const TransactionTypeDetailsSheet = ({ type, onClose }: TransactionTypeDetailsSh
                       {tx.description}
                     </div>
                     <div className="text-zinc-600 text-xs">
-                      {tx.category.name}
-                      {tx.wallet ? ` · ${tx.wallet.name}` : ''} ·{' '}
+                      {tx.category.name} ·{' '}
                       {new Date(tx.date).toLocaleDateString('pt-BR', {
                         day: 'numeric',
                         month: 'short',
@@ -106,9 +97,9 @@ const TransactionTypeDetailsSheet = ({ type, onClose }: TransactionTypeDetailsSh
             </div>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export default TransactionTypeDetailsSheet
+export default WalletDetailsModal

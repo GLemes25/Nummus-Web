@@ -7,8 +7,8 @@ import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet2, Bell, ChevronRight, 
 import { Button } from '@/components/ui/button'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import CustomTooltip from '@/components/dashboard/custom-tooltip'
-import WalletDetailsSheet from '@/components/wallets/wallet-details-sheet'
-import TransactionTypeDetailsSheet from '@/components/transactions/transaction-type-details-sheet'
+import WalletDetailsModal from '@/components/wallets/wallet-details-modal'
+import TransactionTypeDetailsModal from '@/components/transactions/transaction-type-details-modal'
 import { useWallets } from '@/hooks/use-wallets'
 import { useTransactions } from '@/hooks/use-transactions'
 import { useSession } from '@/lib/auth-client'
@@ -402,8 +402,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         )}
       </div>
 
-      <WalletDetailsSheet wallet={selectedWallet} onClose={() => setSelectedWallet(null)} />
-      <TransactionTypeDetailsSheet type={selectedTxType} onClose={() => setSelectedTxType(null)} />
+      <WalletDetailsModal wallet={selectedWallet} onClose={() => setSelectedWallet(null)} />
+      <TransactionTypeDetailsModal type={selectedTxType} onClose={() => setSelectedTxType(null)} />
     </div>
   )
 }
