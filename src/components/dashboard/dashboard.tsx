@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Ce
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet2, Bell, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
+import CashFlowChart from '@/components/dashboard/cash-flow-chart'
 import CustomTooltip from '@/components/dashboard/custom-tooltip'
 import WalletDetailsModal from '@/components/wallets/wallet-details-modal'
 import TransactionTypeDetailsModal from '@/components/transactions/transaction-type-details-modal'
@@ -245,6 +246,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
           </motion.div>
         ))}
       </div>
+
+      <CashFlowChart />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-5">
         <div className="bg-card border border-border rounded-xl p-6">
