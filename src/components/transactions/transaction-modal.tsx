@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Loader2 } from 'lucide-react'
+import { CalendarIcon, Loader2, Slash } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -189,13 +189,21 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
                             {selectedCategory.name}
                           </span>
                         ) : (
-                          'Sem categoria'
+                          <span className="flex items-center gap-2">
+                            <Slash size={16} className="shrink-0 text-muted-foreground" />
+                            Sem categoria
+                          </span>
                         )}
                       </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent sideOffset={4} className="max-h-72">
-                    <SelectItem value={NO_CATEGORY}>Sem categoria</SelectItem>
+                    <SelectItem value={NO_CATEGORY}>
+                      <span className="flex items-center gap-2">
+                        <Slash size={16} className="shrink-0 text-muted-foreground" />
+                        Sem categoria
+                      </span>
+                    </SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         <span className="flex items-center gap-2">
@@ -308,6 +316,7 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
+                    locale={ptBR}
                     selected={field.value}
                     onSelect={(date) => date && field.onChange(date)}
                     disabled={(date) => date > new Date()}
