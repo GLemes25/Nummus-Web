@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Loader2, Slash } from 'lucide-react'
+import { CalendarIcon, Loader2, Slash, Wallet as WalletIcon } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -239,55 +239,81 @@ const TransferForm = ({ onSuccess }: { onSuccess: () => void }) => {
         <FormField
           control={form.control}
           name="sourceWalletId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                CARTEIRA DE ORIGEM
-              </FormLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione a carteira" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {wallets.map((wallet) => (
-                    <SelectItem key={wallet.id} value={wallet.id}>
-                      {wallet.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const selectedWallet = wallets.find((wallet) => wallet.id === field.value)
+            return (
+              <FormItem>
+                <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                  CARTEIRA DE ORIGEM
+                </FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione a carteira">
+                        {selectedWallet ? (
+                          <span className="flex items-center gap-2">
+                            <WalletIcon size={16} className="shrink-0" />
+                            {selectedWallet.name}
+                          </span>
+                        ) : undefined}
+                      </SelectValue>
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {wallets.map((wallet) => (
+                      <SelectItem key={wallet.id} value={wallet.id}>
+                        <span className="flex items-center gap-2">
+                          <WalletIcon size={16} className="shrink-0" />
+                          {wallet.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         <FormField
           control={form.control}
           name="destinationWalletId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                CARTEIRA DE DESTINO
-              </FormLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione a carteira" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {wallets.map((wallet) => (
-                    <SelectItem key={wallet.id} value={wallet.id}>
-                      {wallet.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const selectedWallet = wallets.find((wallet) => wallet.id === field.value)
+            return (
+              <FormItem>
+                <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                  CARTEIRA DE DESTINO
+                </FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione a carteira">
+                        {selectedWallet ? (
+                          <span className="flex items-center gap-2">
+                            <WalletIcon size={16} className="shrink-0" />
+                            {selectedWallet.name}
+                          </span>
+                        ) : undefined}
+                      </SelectValue>
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {wallets.map((wallet) => (
+                      <SelectItem key={wallet.id} value={wallet.id}>
+                        <span className="flex items-center gap-2">
+                          <WalletIcon size={16} className="shrink-0" />
+                          {wallet.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         <FormField
