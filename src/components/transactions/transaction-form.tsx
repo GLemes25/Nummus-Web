@@ -9,6 +9,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import {
   Form,
   FormControl,
@@ -195,32 +196,47 @@ const TransactionForm = ({
         <FormField
           control={form.control}
           name="categoryId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                CATEGORIA
-              </FormLabel>
-              <Select
-                value={field.value ?? NO_CATEGORY}
-                onValueChange={(value) => field.onChange(value === NO_CATEGORY ? undefined : value)}
-              >
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value={NO_CATEGORY}>Sem categoria</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const selectedCategory = categories.find((category) => category.id === field.value)
+            return (
+              <FormItem>
+                <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                  CATEGORIA
+                </FormLabel>
+                <Select
+                  value={field.value ?? NO_CATEGORY}
+                  onValueChange={(value) => field.onChange(value === NO_CATEGORY ? undefined : value)}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione uma categoria">
+                        {selectedCategory ? (
+                          <span className="flex items-center gap-2">
+                            <DynamicIcon name={selectedCategory.icon} size={16} className="shrink-0" />
+                            {selectedCategory.name}
+                          </span>
+                        ) : (
+                          'Sem categoria'
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent sideOffset={4} className="max-h-72">
+                    <SelectItem value={NO_CATEGORY}>Sem categoria</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        <span className="flex items-center gap-2">
+                          <DynamicIcon name={category.icon} size={16} className="shrink-0" />
+                          {category.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         <FormField
