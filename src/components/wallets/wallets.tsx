@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, MoreHorizontal, Wallet as WalletIcon, Edit3, Trash2, Loader2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Wallet as WalletIcon, Edit3, Scale, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useWallets } from '@/hooks/use-wallets';
 import AddWalletModal from '@/components/wallets/add-wallet-modal';
+import AdjustBalanceModal from '@/components/wallets/adjust-balance-modal';
 import EditWalletModal from '@/components/wallets/edit-wallet-modal';
 import type { Wallet } from '@/types/api';
 
@@ -54,10 +55,12 @@ const Wallets = () => {
   const [isAddWalletOpen, setIsAddWalletOpen] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
   const [deletingWallet, setDeletingWallet] = useState<Wallet | null>(null);
+  const [adjustingWallet, setAdjustingWallet] = useState<Wallet | null>(null);
   const {
     wallets,
     isLoading,
     error,
+    refetch,
     createWallet,
     isCreating,
     updateWallet,
@@ -159,6 +162,10 @@ const Wallets = () => {
                           <Edit3 size={14} />
                           Editar
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setAdjustingWallet(wallet)}>
+                          <Scale size={14} />
+                          Ajustar Saldo
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           variant="destructive"
                           onClick={() => setDeletingWallet(wallet)}
@@ -249,6 +256,13 @@ const Wallets = () => {
         wallet={editingWallet}
         onUpdateWallet={updateWallet}
         isUpdating={isUpdating}
+      />
+
+      <AdjustBalanceModal
+        isOpen={!!adjustingWallet}
+        onClose={() => setAdjustingWallet(null)}
+        wallet={adjustingWallet}
+        onAdjusted={refetch}
       />
 
       <AlertDialog
