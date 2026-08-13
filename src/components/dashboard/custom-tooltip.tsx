@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 type CustomTooltipProps = {
   active?: boolean;
@@ -10,8 +10,12 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 
   return (
     <div className="bg-muted border border-zinc-700 rounded-lg px-3 py-2">
-      <div className="text-gold font-semibold text-sm">${payload[0].value.toLocaleString()}</div>
-      <div className="text-muted-foreground text-xs">{payload[0].payload.month}</div>
+      <div className="text-gold font-semibold text-sm">
+        ${payload[0].value.toLocaleString()}
+      </div>
+      <div className="text-muted-foreground text-xs">
+        {payload[0].payload.month}
+      </div>
     </div>
   );
 };
