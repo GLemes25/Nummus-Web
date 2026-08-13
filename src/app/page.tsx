@@ -9,7 +9,6 @@ import { useSession, signOut } from '@/lib/auth-client'
 import type { AppView } from '@/types/app'
 
 const App = () => {
-  const [appState, setAppState] = useState<'splash' | 'auth' | 'app'>('splash')
   const [splashDone, setSplashDone] = useState(false)
   const [currentView, setCurrentView] = useState<AppView>('dashboard')
   const [showTransactionModal, setShowTransactionModal] = useState(false)
@@ -22,18 +21,11 @@ const App = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    if (!splashDone || isSessionPending) return
-    if (sessionData?.session) {
-      setAppState('app')
-    } else {
-      setAppState('auth')
-    }
-  }, [splashDone, isSessionPending, sessionData])
+  const appState: 'splash' | 'auth' | 'app' =
+    !splashDone || isSessionPending ? 'splash' : sessionData?.session ? 'app' : 'auth'
 
   const handleLogout = async () => {
     await signOut()
-    setAppState('auth')
     setCurrentView('dashboard')
   }
 
@@ -55,7 +47,6 @@ const App = () => {
           >
             <AuthScreen
               onAuth={() => {
-                setAppState('app')
                 setCurrentView('dashboard')
               }}
             />

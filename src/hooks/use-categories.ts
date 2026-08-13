@@ -9,23 +9,29 @@ export const useCategories = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchCategories = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const res = await apiClient.get("/categories")
-      if (!res) return
-      if (!res.ok) {
+  const fetchCategories = useCallback(() => {
+    return Promise.resolve()
+      .then(() => {
+        setIsLoading(true)
+        setError(null)
+        return apiClient.get("/categories")
+      })
+      .then((res) => {
+        if (!res) return
+        if (!res.ok) {
+          setError("Falha ao carregar categorias")
+          return
+        }
+        return res.json().then((data: Category[]) => {
+          setCategories(data)
+        })
+      })
+      .catch(() => {
         setError("Falha ao carregar categorias")
-        return
-      }
-      const data: Category[] = await res.json()
-      setCategories(data)
-    } catch {
-      setError("Falha ao carregar categorias")
-    } finally {
-      setIsLoading(false)
-    }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   useEffect(() => {

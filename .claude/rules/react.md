@@ -22,3 +22,28 @@
 
 - **Stack Obrigatória:** **SEMPRE** construa formulários utilizando `React Hook Form` em conjunto com `Zod` para validação de esquemas.
 - **Componente Base:** **SEMPRE** utilize o componente wrapper `@components/ui/form.tsx` do shadcn para montar e estruturar os campos dos formulários.
+
+## Efeitos e Estado (`react-hooks/set-state-in-effect`)
+
+O ESLint (via `eslint-plugin-react-hooks`, regras do React Compiler) proíbe chamar `setState` de forma **síncrona** dentro de um `useEffect` — inclusive indiretamente, quando o efeito chama uma função (ex: `fetchData()`) que por sua vez chama `setState` de forma síncrona (antes de qualquer `await`/`.then()`).
+
+- **Estado derivável — NUNCA use `useState` + `useEffect`:** Se um valor pode ser calculado a partir de outros props/states já existentes (ex: combinar `isLoading` de uma sessão com um timer de splash screen), **NUNCA** sincronize-o via `useEffect(() => setX(...), [deps])`. **SEMPRE** compute o valor diretamente durante a renderização (`const x = condição ? a : b`). Veja https://react.dev/learn/you-might-not-need-an-effect.
+- **Busca de dados (fetch) em efeitos:** Ao criar hooks de fetch (`useTransactions`, `useWallets`, etc.) chamados via `useEffect(() => { fetchX() }, [fetchX])`, **NUNCA** chame `setState` (ex: `setIsLoading(true)`) como a primeira instrução síncrona da função `fetchX`, mesmo dentro de um `async function`. **SEMPRE** encadeie a lógica com `.then()/.catch()/.finally()`, colocando as chamadas de `setState` dentro dos callbacks encadeados (nunca no nível síncrono/top-level da função invocada pelo efeito):
+
+```ts
+const fetchX = useCallback(() => {
+  return Promise.resolve()
+    .then(() => {
+      setIsLoading(true)
+      return apiClient.get("/x")
+    })
+    .then((res) => {
+      // setState aqui dentro é seguro
+    })
+    .finally(() => {
+      setIsLoading(false)
+    })
+}, [])
+```
+
+- **Motivo:** `setState` síncrono dentro de um efeito causa renders em cascata na mesma fase de commit. O linter rastreia chamadas diretas (`CallExpression`) a funções registradas como "setters" — passar essas funções como argumento de `.then()/.catch()` (uma `MethodCall`) não propaga o aviso, pois cria um escopo de função separado.
