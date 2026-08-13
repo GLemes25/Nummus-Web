@@ -12,6 +12,7 @@ Use APENAS os seguintes prefixos, baseando-se na natureza das alterações:
 - **refactor**: Uma alteração de código que não corrige um bug nem adiciona uma funcionalidade (ex: simplificar a lógica de um componente, atualizar regras).
 - **chore**: Atualização de dependências, tarefas de build ou configurações de ferramentas.
 - **docs**: Mudanças apenas na documentação.
+- **merge**: Utilizado exclusivamente para mesclagem de branches (ex: trazer alterações da `dev` para a `main`).
 
 ## 2. Regras de Formatação
 
@@ -20,6 +21,7 @@ Use APENAS os seguintes prefixos, baseando-se na natureza das alterações:
 - **Letra Minúscula**: A descrição deve começar com letra minúscula logo após o prefixo e o espaço (ex: `feat: implement...`).
 - **Sem Pontuação**: Não coloque ponto final (`.`) no final da mensagem de commit.
 - **Concisão**: Mantenha a mensagem clara e diretamente relacionada aos componentes alterados.
+- **Padrão de Merge**: Para commits de mesclagem, use estritamente o formato: `merge: merge branch '<branch-origem>' into <branch-destino>`.
 
 ## 3. Exemplos de Referência
 
@@ -31,10 +33,13 @@ Use estes commits passados do repositório como seu padrão de tom e estrutura:
 - `feat: add business hours and open status logic`
 - `refactor: update rules to claude code`
 - `style: remove gradient color to match minimalist design`
+- `merge: merge branch 'dev' into main`
+- `merge: merge branch 'feat/new-dashboard' into dev`
 
 ## 4. Fluxo de Execução
 
 1. Analise brevemente os arquivos modificados (adicione-os ao _stage_ com `git add` se o usuário solicitar).
 2. Gere a mensagem de commit apropriada silenciosamente em inglês.
-3. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
-4. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.
+3. Se a ação for uma mesclagem, utilize o formato padrão de merge.
+4. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
+5. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.

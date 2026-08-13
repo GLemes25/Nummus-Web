@@ -234,7 +234,7 @@ const PricingTable = () => (
             </p>
             <div className="flex items-center gap-2.5">
               <div
-                className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-xs text-foreground font-bold shrink-0"
+                className="w-8.5 h-8.5 rounded-full flex items-center justify-center text-xs text-foreground font-bold shrink-0"
                 style={{
                   background: `linear-gradient(135deg, ${t.color}, ${t.color}88)`,
                 }}

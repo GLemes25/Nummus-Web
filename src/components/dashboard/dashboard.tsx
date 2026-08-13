@@ -195,7 +195,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + i * 0.06 }}
-            className={`bg-card border border-border rounded-xl p-4 py-[18px] ${stat.txType ? 'cursor-pointer hover:bg-foreground/5 transition-colors' : ''}`}
+            className={`bg-card border border-border rounded-xl p-4 py-4.5 ${stat.txType ? 'cursor-pointer hover:bg-foreground/5 transition-colors' : ''}`}
             onClick={stat.txType ? () => setSelectedTxType(stat.txType) : undefined}
           >
             <div className="flex justify-between mb-2.5">
@@ -367,14 +367,14 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 + i * 0.05 }}
-                className="flex items-center py-[13px]"
+                className="flex items-center py-3.25"
                 style={{
                   borderBottom:
                     i < transactions.length - 1 ? '1px solid #1f1f22' : 'none',
                 }}
               >
                 <div
-                  className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
+                  className="w-10.5 h-10.5 rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
                   style={{
                     backgroundColor: (tx.category?.color ?? '#71717a') + '22',
                     border: `1px solid ${tx.category?.color ?? '#71717a'}44`,

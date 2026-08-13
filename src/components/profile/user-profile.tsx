@@ -208,7 +208,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => {
         >
           <div className="flex items-center gap-2 mb-2 pl-1">
             <div
-              className="w-[22px] h-[22px] rounded-[6px] flex items-center justify-center"
+              className="w-5.5 h-5.5 rounded-[6px] flex items-center justify-center"
               style={{ backgroundColor: section.iconColor + "20" }}
             >
               <SectionIcon size={12} style={{ color: section.iconColor }} />
@@ -222,7 +222,7 @@ const UserProfile = ({ onLogout }: UserProfileProps) => {
             {section.items.map((item, ii) => (
               <div
                 key={item.label}
-                className={`flex items-center px-[18px] py-[13px] ${!item.toggle ? "hover:bg-foreground/2 cursor-pointer transition-colors" : ""}`}
+                className={`flex items-center px-4.5 py-3.25 ${!item.toggle ? "hover:bg-foreground/2 cursor-pointer transition-colors" : ""}`}
                 style={{
                   borderBottom:
                     ii < section.items.length - 1

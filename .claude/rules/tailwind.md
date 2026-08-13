@@ -1,5 +1,9 @@
 # Regras de Tailwind CSS
 
+## 🛑 STRICT RULE: Canonical Classes First
+
+NEVER use arbitrary pixel values (e.g., `h-[42px]`, `p-[16px]`, `w-[18px]`) if a canonical Tailwind spacing class exists. ALWAYS use the default spacing scale (e.g., `h-10.5`, `p-4`, `w-4.5`). Arbitrary values `-[...]` should ONLY be used for highly specific, non-standard measurements that fall outside the Tailwind scale.
+
 ## Valores Arbitrários (Arbitrary Values)
 
 ### Espaçamento e Tamanho
