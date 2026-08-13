@@ -35,31 +35,38 @@ export const useTransactions = (params: FetchParams = {}) => {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
 
-  const fetchTransactions = useCallback(async () => {
-    if (!isEnabled) return
-    setIsLoading(true)
-    setError(null)
-    try {
-      const query = new URLSearchParams()
-      if (params.page) query.set("page", String(params.page))
-      if (params.limit) query.set("limit", String(params.limit))
-      if (params.walletId) query.set("walletId", params.walletId)
-      if (params.type) query.set("type", params.type)
+  const fetchTransactions = useCallback(() => {
+    if (!isEnabled) return Promise.resolve()
 
-      const res = await apiClient.get(`/transactions?${query.toString()}`)
-      if (!res) return
-      if (!res.ok) {
+    const query = new URLSearchParams()
+    if (params.page) query.set("page", String(params.page))
+    if (params.limit) query.set("limit", String(params.limit))
+    if (params.walletId) query.set("walletId", params.walletId)
+    if (params.type) query.set("type", params.type)
+
+    return Promise.resolve()
+      .then(() => {
+        setIsLoading(true)
+        setError(null)
+        return apiClient.get(`/transactions?${query.toString()}`)
+      })
+      .then((res) => {
+        if (!res) return
+        if (!res.ok) {
+          setError("Falha ao carregar transações")
+          return
+        }
+        return res.json().then((data) => {
+          setTransactions(data.data)
+          setMeta(data.meta)
+        })
+      })
+      .catch(() => {
         setError("Falha ao carregar transações")
-        return
-      }
-      const data = await res.json()
-      setTransactions(data.data)
-      setMeta(data.meta)
-    } catch {
-      setError("Falha ao carregar transações")
-    } finally {
-      setIsLoading(false)
-    }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [isEnabled, params.page, params.limit, params.walletId, params.type])
 
   const deleteTransaction = useCallback(

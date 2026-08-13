@@ -23,23 +23,29 @@ export const useWallets = () => {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const fetchWallets = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const res = await apiClient.get("/wallets")
-      if (!res) return
-      if (!res.ok) {
+  const fetchWallets = useCallback(() => {
+    return Promise.resolve()
+      .then(() => {
+        setIsLoading(true)
+        setError(null)
+        return apiClient.get("/wallets")
+      })
+      .then((res) => {
+        if (!res) return
+        if (!res.ok) {
+          setError("Falha ao carregar carteiras")
+          return
+        }
+        return res.json().then((data: Wallet[]) => {
+          setWallets(data)
+        })
+      })
+      .catch(() => {
         setError("Falha ao carregar carteiras")
-        return
-      }
-      const data: Wallet[] = await res.json()
-      setWallets(data)
-    } catch {
-      setError("Falha ao carregar carteiras")
-    } finally {
-      setIsLoading(false)
-    }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   const createWallet = useCallback(
