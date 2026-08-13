@@ -35,7 +35,7 @@ export type Transaction = {
   description: string
   walletId: string | null
   creditCardId: string | null
-  categoryId: string
+  categoryId: string | null
   userId: string
   createdAt: string
   updatedAt: string
@@ -44,7 +44,7 @@ export type Transaction = {
     name: string
     color: string
     icon: string
-  }
+  } | null
   wallet: {
     id: string
     name: string

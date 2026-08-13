@@ -376,18 +376,18 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
                 <div
                   className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
                   style={{
-                    backgroundColor: tx.category.color + '22',
-                    border: `1px solid ${tx.category.color}44`,
+                    backgroundColor: (tx.category?.color ?? '#71717a') + '22',
+                    border: `1px solid ${tx.category?.color ?? '#71717a'}44`,
                   }}
                 >
-                  <DynamicIcon name={tx.category.icon} size={19} />
+                  <DynamicIcon name={tx.category?.icon ?? 'circle'} size={19} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-foreground text-sm font-medium mb-0.5 truncate">
                     {tx.description}
                   </div>
                   <div className="text-zinc-600 text-xs">
-                    {tx.category.name} ·{' '}
+                    {tx.category?.name ?? 'Sem categoria'} ·{' '}
                     {new Date(tx.date).toLocaleDateString('pt-BR', {
                       day: 'numeric',
                       month: 'short',
