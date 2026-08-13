@@ -135,14 +135,14 @@ const Wallets = () => {
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl p-[22px] relative overflow-hidden cursor-pointer min-h-40 flex flex-col justify-between"
+                  className="rounded-2xl p-5.5 relative overflow-hidden cursor-pointer min-h-40 flex flex-col justify-between"
                   style={{ background: walletGradients[i % walletGradients.length] }}
                 >
                   <div className="absolute -top-8 -right-8 w-30 h-30 rounded-full bg-white/8 pointer-events-none" />
                   <div className="absolute -bottom-5 -left-5 w-25 h-25 rounded-full bg-black/10 pointer-events-none" />
 
                   <div className="flex justify-between items-start">
-                    <div className="w-[38px] h-[38px] rounded-[10px] bg-white/15 flex items-center justify-center">
+                    <div className="w-9.5 h-9.5 rounded-[10px] bg-white/15 flex items-center justify-center">
                       <WalletIcon size={18} color="rgba(255,255,255,0.9)" />
                     </div>
                     <DropdownMenu>
@@ -151,7 +151,7 @@ const Wallets = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="w-[30px] h-[30px] rounded-[7px] bg-black/20 text-white/70 hover:bg-black/30 hover:text-white"
+                            className="w-7.5 h-7.5 rounded-[7px] bg-black/20 text-white/70 hover:bg-black/30 hover:text-white"
                           >
                             <MoreHorizontal size={14} />
                           </Button>
@@ -192,7 +192,7 @@ const Wallets = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: wallets.length * 0.06 }}
                 onClick={() => setIsAddWalletOpen(true)}
-                className="rounded-2xl border-2 border-dashed border-border bg-transparent p-[22px] flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-40 text-zinc-600 transition-colors hover:border-brand hover:text-brand"
+                className="rounded-2xl border-2 border-dashed border-border bg-transparent p-5.5 flex flex-col items-center justify-center gap-2.5 cursor-pointer min-h-40 text-zinc-600 transition-colors hover:border-brand hover:text-brand"
               >
                 <Plus size={24} />
                 <span className="text-sm">Adicionar Carteira</span>
@@ -213,7 +213,7 @@ const Wallets = () => {
                 style={{ borderBottom: i < categoryData.length - 1 ? '1px solid #1f1f22' : 'none' }}
               >
                 <div
-                  className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center text-xl mr-3.5 shrink-0"
+                  className="w-10.5 h-10.5 rounded-[11px] flex items-center justify-center text-xl mr-3.5 shrink-0"
                   style={{ backgroundColor: cat.color + '22', border: `1px solid ${cat.color}44` }}
                 >
                   {cat.icon}
@@ -230,10 +230,10 @@ const Wallets = () => {
                 />
 
                 <div className="flex gap-1.5">
-                  <Button variant="secondary" size="icon" className="w-[30px] h-[30px] rounded-[7px] bg-muted text-muted-foreground">
+                  <Button variant="secondary" size="icon" className="w-7.5 h-7.5 rounded-[7px] bg-muted text-muted-foreground">
                     <Edit3 size={13} />
                   </Button>
-                  <Button variant="destructive" size="icon" className="w-[30px] h-[30px] rounded-[7px]">
+                  <Button variant="destructive" size="icon" className="w-7.5 h-7.5 rounded-[7px]">
                     <Trash2 size={13} />
                   </Button>
                 </div>

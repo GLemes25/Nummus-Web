@@ -185,7 +185,7 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                       }}
                     >
                       <div
-                        className="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
+                        className="w-10.5 h-10.5 rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
                         style={{
                           backgroundColor: (tx.category?.color ?? '#71717a') + '22',
                           border: `1px solid ${tx.category?.color ?? '#71717a'}44`,
