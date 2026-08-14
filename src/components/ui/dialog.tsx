@@ -28,7 +28,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0",
+        "fixed inset-0 z-200 bg-black/70 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
       )}
       {...props}
@@ -50,7 +50,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-[201] flex max-h-[85vh] w-[90vw] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl border border-zinc-700 ui-surface-dark bg-clip-padding text-sm text-foreground shadow-lg transition duration-200 ease-in-out data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 sm:max-w-lg sm:rounded-2xl md:max-w-2xl",
+          "fixed top-1/2 left-1/2 z-201 flex max-h-[85vh] w-[90vw] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl border border-zinc-700 ui-surface-dark bg-clip-padding text-sm text-foreground shadow-lg transition duration-200 ease-in-out data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 sm:max-w-lg sm:rounded-2xl md:max-w-2xl",
           className
         )}
         {...props}
