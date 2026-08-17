@@ -12,7 +12,7 @@ Use APENAS os seguintes prefixos, baseando-se na natureza das alterações:
 - **refactor**: Uma alteração de código que não corrige um bug nem adiciona uma funcionalidade (ex: simplificar a lógica de um componente, atualizar regras).
 - **chore**: Atualização de dependências, tarefas de build ou configurações de ferramentas.
 - **docs**: Mudanças apenas na documentação.
-- **merge**: Utilizado exclusivamente para mesclagem de branches (ex: trazer alterações da `dev` para a `main`).
+- **merge**: Utilizado exclusivamente para mesclagem de branches. **NUNCA** use mensagens genéricas — veja a regra de Padrão de Merge abaixo.
 
 ## 2. Regras de Formatação
 
@@ -21,7 +21,8 @@ Use APENAS os seguintes prefixos, baseando-se na natureza das alterações:
 - **Letra Minúscula**: A descrição deve começar com letra minúscula logo após o prefixo e o espaço (ex: `feat: implement...`).
 - **Sem Pontuação**: Não coloque ponto final (`.`) no final da mensagem de commit.
 - **Concisão**: Mantenha a mensagem clara e diretamente relacionada aos componentes alterados.
-- **Padrão de Merge**: Para commits de mesclagem, use estritamente o formato: `merge: merge branch '<branch-origem>' into <branch-destino>`.
+- **Padrão de Merge**: **NUNCA** use mensagens genéricas como `merge: merge branch 'dev' into main`. Você **DEVE** resumir as principais funcionalidades ou correções que estão sendo mescladas. O formato obrigatório é:
+  `merge: <resumo claro do que foi feito> (<branch-origem> -> <branch-destino>)`
 
 ## 3. Exemplos de Referência
 
@@ -33,13 +34,13 @@ Use estes commits passados do repositório como seu padrão de tom e estrutura:
 - `feat: add business hours and open status logic`
 - `refactor: update rules to claude code`
 - `style: remove gradient color to match minimalist design`
-- `merge: merge branch 'dev' into main`
-- `merge: merge branch 'feat/new-dashboard' into dev`
+- `merge: implement visual dashboard charts and category CRUD (dev -> main)`
+- `merge: fix CORS issues and add soft delete logic (feat/crud -> dev)`
 
 ## 4. Fluxo de Execução
 
 1. Analise brevemente os arquivos modificados (adicione-os ao _stage_ com `git add` se o usuário solicitar).
 2. Gere a mensagem de commit apropriada silenciosamente em inglês.
-3. Se a ação for uma mesclagem, utilize o formato padrão de merge.
+3. Se a ação for uma mesclagem, analise os commits da branch de origem para extrair um resumo descritivo e aplique o formato obrigatório de merge.
 4. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
 5. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.
