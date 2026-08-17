@@ -12,9 +12,11 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 2,
   });
 
+type ChartEntry = ExpenseByCategory & { chartValue: number };
+
 type CategoryTooltipProps = {
   active?: boolean;
-  payload?: { value: number; payload: ExpenseByCategory }[];
+  payload?: { value: number; payload: ChartEntry }[];
 };
 
 const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
@@ -29,9 +31,19 @@ const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
         />
         <span className="text-foreground font-medium">{entry.name}</span>
       </div>
-      <span className="text-muted-foreground">R$ {formatCurrency(entry.value)}</span>
+      <span className="text-muted-foreground">
+        R$ {formatCurrency(entry.value ?? 0)}
+      </span>
     </div>
   );
+};
+
+const GHOST_ENTRY: ChartEntry = {
+  name: "Nenhum gasto",
+  value: 0,
+  chartValue: 1,
+  color: "#71717a",
+  icon: "minus",
 };
 
 const ExpensesCategoryChart = () => {
@@ -42,6 +54,12 @@ const ExpensesCategoryChart = () => {
   });
   const currentMonthLabelCapitalized =
     currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1);
+
+  const validData = expenses.filter((item) => item.value > 0);
+  const chartData: ChartEntry[] =
+    validData.length > 0
+      ? validData.map((d) => ({ ...d, chartValue: d.value }))
+      : [GHOST_ENTRY];
 
   return (
     <div className="bg-card border border-border rounded-xl p-6">
@@ -64,25 +82,21 @@ const ExpensesCategoryChart = () => {
             ))}
           </div>
         </div>
-      ) : expenses.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          Sem gastos registrados este mês
-        </div>
       ) : (
         <>
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
-                data={expenses}
+                data={chartData}
                 cx="50%"
                 cy="50%"
                 innerRadius={45}
                 outerRadius={70}
-                paddingAngle={2}
-                dataKey="value"
+                paddingAngle={validData.length > 0 ? 2 : 0}
+                dataKey="chartValue"
                 stroke="none"
               >
-                {expenses.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`c-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -90,7 +104,7 @@ const ExpensesCategoryChart = () => {
             </PieChart>
           </ResponsiveContainer>
           <div className="flex flex-col gap-1.5 mt-2">
-            {expenses.map((cat) => (
+            {chartData.map((cat) => (
               <div key={cat.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span style={{ color: cat.color }} className="flex shrink-0">
@@ -99,7 +113,7 @@ const ExpensesCategoryChart = () => {
                   <span className="text-zinc-400 text-xs">{cat.name}</span>
                 </div>
                 <span className="text-foreground text-xs font-medium">
-                  R$ {formatCurrency(cat.value)}
+                  R$ {formatCurrency(cat.value ?? 0)}
                 </span>
               </div>
             ))}
