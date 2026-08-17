@@ -2,6 +2,7 @@
 
 import BalanceTrendChart from "@/components/dashboard/balance-trend-chart";
 import CashFlowChart from "@/components/dashboard/cash-flow-chart";
+import ExpensesCategoryChart from "@/components/dashboard/expenses-category-chart";
 import SummaryCards from "@/components/dashboard/summary-cards";
 import TransactionTypeDetailsModal from "@/components/transactions/transaction-type-details-modal";
 import { Button } from "@/components/ui/button";
@@ -21,24 +22,8 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
 
 type IncomeOrExpense = "INCOME" | "EXPENSE";
-
-const categoryChartData = [
-  { name: "Moradia", value: 1800, color: "#7C3AED" },
-  { name: "Alimentação", value: 680, color: "#10B981" },
-  { name: "Transporte", value: 340, color: "#F43F5E" },
-  { name: "Compras", value: 520, color: "#BFA071" },
-  { name: "Saúde", value: 180, color: "#06B6D4" },
-  { name: "Outros", value: 261, color: "#8B5CF6" },
-];
 
 type DashboardProps = {
   onNewTransaction: () => void;
@@ -196,59 +181,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-5">
         <BalanceTrendChart />
-
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="mb-3.5">
-            <h3 className="text-foreground m-0 mb-1 font-semibold">Gastos</h3>
-            <p className="text-muted-foreground text-sm m-0">
-              Por categoria · período atual
-            </p>
-          </div>
-          <ResponsiveContainer width="100%" height={150}>
-            <PieChart>
-              <Pie
-                data={categoryChartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={45}
-                outerRadius={70}
-                paddingAngle={2}
-                dataKey="value"
-                stroke="none"
-              >
-                {categoryChartData.map((entry, index) => (
-                  <Cell key={`c-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#27272a",
-                  border: "1px solid #3f3f46",
-                  borderRadius: 8,
-                  color: "#fafafa",
-                  fontSize: 13,
-                }}
-                formatter={(v) => [`R$ ${Number(v).toFixed(0)}`, ""]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex flex-col gap-1.5">
-            {categoryChartData.map((cat) => (
-              <div key={cat.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-xs shrink-0"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <span className="text-zinc-400 text-xs">{cat.name}</span>
-                </div>
-                <span className="text-foreground text-xs font-medium">
-                  R$ {cat.value.toFixed(0)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ExpensesCategoryChart />
       </div>
 
       <div className="bg-card border border-border rounded-xl p-6">

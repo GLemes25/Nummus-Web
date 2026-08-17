@@ -68,3 +68,10 @@ export type NetWorthTrendPoint = {
   month: string
   balance: number
 }
+
+export type ExpenseByCategory = {
+  name: string
+  value: number
+  color: string
+  icon: string
+}
