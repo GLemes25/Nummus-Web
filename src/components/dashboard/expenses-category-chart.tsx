@@ -47,7 +47,7 @@ const GHOST_ENTRY: ChartEntry = {
 };
 
 const ExpensesCategoryChart = () => {
-  const { expenses, isLoading } = useExpensesByCategory();
+  const { data, isLoading } = useExpensesByCategory();
 
   const currentMonthLabel = new Date().toLocaleDateString("pt-BR", {
     month: "long",
@@ -55,7 +55,9 @@ const ExpensesCategoryChart = () => {
   const currentMonthLabelCapitalized =
     currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1);
 
-  const validData = (expenses ?? []).filter((item) => Number(item.value) > 0);
+  const validData = Array.isArray(data)
+    ? data.filter((item) => Number(item.value) > 0)
+    : [];
   const chartData: ChartEntry[] =
     validData.length > 0
       ? validData.map((d) => ({ ...d, chartValue: Number(d.value) }))

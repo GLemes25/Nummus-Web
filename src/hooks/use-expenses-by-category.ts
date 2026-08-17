@@ -38,5 +38,5 @@ export const useExpensesByCategory = () => {
     fetchExpenses()
   }, [fetchExpenses])
 
-  return { expenses, isLoading, error, refetch: fetchExpenses }
+  return { data: expenses, isLoading, error, refetch: fetchExpenses }
 }
