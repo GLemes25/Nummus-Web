@@ -14,7 +14,7 @@ type SummaryCardsProps = {
 }
 
 const formatCurrency = (value: number) =>
-  value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  (value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 const SummaryCards = ({
   monthlyIncome,
