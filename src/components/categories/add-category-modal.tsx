@@ -1,43 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CategoryForm,
+  NO_PARENT,
+  type CategoryFormValues,
+} from "@/components/categories/category-form";
 import type { Category } from "@/types/api";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const NO_PARENT = "none";
-
-const addCategorySchema = z.object({
-  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  color: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Informe uma cor hexadecimal válida"),
-  icon: z.string().min(1, "Informe um ícone"),
-  parentId: z.string(),
-});
-
-type AddCategoryFormValues = z.infer<typeof addCategorySchema>;
 
 type CreateCategoryInput = {
   name: string;
@@ -54,6 +25,13 @@ type AddCategoryModalProps = {
   isCreating: boolean;
 };
 
+const ADD_CATEGORY_DEFAULT_VALUES: CategoryFormValues = {
+  name: "",
+  color: "#7C3AED",
+  icon: "tag",
+  parentId: NO_PARENT,
+};
+
 const AddCategoryModal = ({
   isOpen,
   onClose,
@@ -61,38 +39,17 @@ const AddCategoryModal = ({
   onCreateCategory,
   isCreating,
 }: AddCategoryModalProps) => {
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const form = useForm<AddCategoryFormValues>({
-    resolver: zodResolver(addCategorySchema),
-    defaultValues: {
-      name: "",
-      color: "#7C3AED",
-      icon: "tag",
-      parentId: NO_PARENT,
-    },
-  });
-
-  const handleClose = () => {
-    form.reset();
-    setSubmitError(null);
-    onClose();
-  };
-
-  const onSubmit = async (values: AddCategoryFormValues) => {
-    setSubmitError(null);
+  const handleSubmit = async (values: CategoryFormValues) => {
     const isSuccess = await onCreateCategory({
       name: values.name,
       color: values.color,
       icon: values.icon,
       parentId: values.parentId === NO_PARENT ? null : values.parentId,
     });
-    if (!isSuccess) {
-      setSubmitError("Erro ao criar categoria. Tente novamente.");
-      return;
+    if (isSuccess) {
+      onClose();
     }
-    form.reset();
-    onClose();
+    return isSuccess;
   };
 
   return (
@@ -105,7 +62,7 @@ const AddCategoryModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onClick={handleClose}
+            onClick={onClose}
             className="fixed inset-0 bg-black/70 backdrop-blur-[6px] z-200"
           />
 
@@ -134,131 +91,20 @@ const AddCategoryModal = ({
                 variant="secondary"
                 size="icon"
                 className="bg-muted text-muted-foreground"
-                onClick={handleClose}
+                onClick={onClose}
               >
                 <X size={16} />
               </Button>
             </div>
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="px-6 flex flex-col gap-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                        NOME
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: Alimentação" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="icon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                        ÍCONE
-                      </FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg border border-input flex items-center justify-center shrink-0">
-                            <DynamicIcon name={field.value} size={16} />
-                          </div>
-                          <Input
-                            placeholder="Ex: utensils-crossed"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="color"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                        COR
-                      </FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-2.5">
-                          <input
-                            type="color"
-                            value={field.value}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            className="w-8 h-8 rounded-lg border border-input bg-transparent p-0.5 shrink-0 cursor-pointer"
-                          />
-                          <Input placeholder="#7C3AED" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="parentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                        CATEGORIA PAI
-                      </FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione uma categoria pai" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent sideOffset={4} className="max-h-72">
-                          <SelectItem value={NO_PARENT}>Nenhuma</SelectItem>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {submitError && (
-                  <p className="text-expense text-sm text-center">
-                    {submitError}
-                  </p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={isCreating}
-                  className="w-full mt-1 bg-brand text-brand-foreground hover:bg-brand/90 font-semibold text-[15px]"
-                >
-                  {isCreating ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    "Criar Categoria"
-                  )}
-                </Button>
-              </form>
-            </Form>
+            <CategoryForm
+              defaultValues={ADD_CATEGORY_DEFAULT_VALUES}
+              categories={categories}
+              onSubmit={handleSubmit}
+              isSubmitting={isCreating}
+              submitLabel="Criar Categoria"
+              submitErrorMessage="Erro ao criar categoria. Tente novamente."
+            />
           </motion.div>
         </>
       )}

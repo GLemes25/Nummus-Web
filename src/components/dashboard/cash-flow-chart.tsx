@@ -12,7 +12,7 @@ import { useTransactions } from "@/hooks/use-transactions";
 import type { Transaction } from "@/types/api";
 import { eachDayOfInterval, format, startOfMonth } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 
 type DailyCashFlow = {
   date: string;
@@ -24,6 +24,15 @@ const chartConfig = {
   income: { label: "Receitas", color: "var(--color-income)" },
   expense: { label: "Despesas", color: "var(--color-expense)" },
 } satisfies ChartConfig;
+
+const incomeHeatColors = ["#ccfbf1", "#5eead4", "#10b981", "#059669", "#064e3b"];
+const expenseHeatColors = ["#ffedd5", "#fb923c", "#ef4444", "#b91c1c", "#7f1d1d"];
+
+const getColorForValue = (value: number, max: number, colors: string[]) => {
+  const ratio = value / max;
+  const index = Math.min(Math.floor(ratio * colors.length), colors.length - 1);
+  return colors[index];
+};
 
 const buildCashFlowSeries = (transactions: Transaction[]): DailyCashFlow[] => {
   const now = new Date();
@@ -71,9 +80,11 @@ const CashFlowChart = () => {
 
   const data = buildCashFlowSeries(transactions);
   const hasMovement = data.some((day) => day.income > 0 || day.expense > 0);
+  const maxIncome = Math.max(...data.map((day) => day.income), 1);
+  const maxExpense = Math.max(...data.map((day) => day.expense), 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 mb-5">
+    <div className="bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl p-6 mb-5">
       <div className="mb-5">
         <h3 className="text-foreground m-0 mb-1 font-semibold">
           Fluxo de Caixa
@@ -123,18 +134,22 @@ const CashFlowChart = () => {
               cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
               content={<CashFlowTooltip />}
             />
-            <Bar
-              dataKey="income"
-              fill="var(--color-income)"
-              radius={[3, 3, 0, 0]}
-              maxBarSize={18}
-            />
-            <Bar
-              dataKey="expense"
-              fill="var(--color-expense)"
-              radius={[3, 3, 0, 0]}
-              maxBarSize={18}
-            />
+            <Bar dataKey="income" fill="var(--color-income)" radius={[4, 4, 0, 0]} maxBarSize={18}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`income-${entry.date}-${index}`}
+                  fill={getColorForValue(entry.income, maxIncome, incomeHeatColors)}
+                />
+              ))}
+            </Bar>
+            <Bar dataKey="expense" fill="var(--color-expense)" radius={[4, 4, 0, 0]} maxBarSize={18}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`expense-${entry.date}-${index}`}
+                  fill={getColorForValue(entry.expense, maxExpense, expenseHeatColors)}
+                />
+              ))}
+            </Bar>
             <ChartLegend content={<ChartLegendContent />} />
           </BarChart>
         </ChartContainer>

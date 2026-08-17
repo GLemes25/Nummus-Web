@@ -45,7 +45,6 @@ const EditTransactionModal = ({
               amount: String(transaction.amount),
               categoryId: transaction.categoryId ?? undefined,
               description: transaction.description,
-              // a UI ainda não oferece CREDIT_CARD como forma de pagamento
               paymentMethod: transaction.paymentMethod as TransactionFormValues['paymentMethod'],
               walletId: transaction.walletId ?? '',
               date: new Date(transaction.date),

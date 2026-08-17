@@ -43,6 +43,7 @@ const paymentMethodOptions: { value: PaymentMethod; label: string }[] = [
   { value: 'CASH', label: 'Dinheiro' },
   { value: 'BANK_TRANSFER', label: 'Transferência' },
   { value: 'DEBIT_CARD', label: 'Débito' },
+  { value: 'CREDIT_CARD', label: 'Crédito' },
 ]
 
 const NO_CATEGORY = '__none__'
@@ -63,7 +64,7 @@ const transactionFormSchema = z.object({
   ),
   categoryId: z.string().optional(),
   description: z.string().min(1, 'Informe uma descrição'),
-  paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD']),
+  paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD', 'CREDIT_CARD']),
   walletId: z.string().min(1, 'Selecione uma carteira'),
   date: z.date({ error: 'Selecione uma data válida' }),
 })
@@ -271,7 +272,11 @@ const TransactionForm = ({
               <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
                 FORMA DE PAGAMENTO
               </FormLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                items={paymentMethodOptions}
+                value={field.value}
+                onValueChange={field.onChange}
+              >
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione a forma de pagamento" />
