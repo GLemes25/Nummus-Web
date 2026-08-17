@@ -55,10 +55,10 @@ const ExpensesCategoryChart = () => {
   const currentMonthLabelCapitalized =
     currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1);
 
-  const validData = expenses.filter((item) => item.value > 0);
+  const validData = (expenses ?? []).filter((item) => Number(item.value) > 0);
   const chartData: ChartEntry[] =
     validData.length > 0
-      ? validData.map((d) => ({ ...d, chartValue: d.value }))
+      ? validData.map((d) => ({ ...d, chartValue: Number(d.value) }))
       : [GHOST_ENTRY];
 
   return (
@@ -103,21 +103,23 @@ const ExpensesCategoryChart = () => {
               <Tooltip content={<CategoryTooltip />} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="flex flex-col gap-1.5 mt-2">
-            {chartData.map((cat) => (
-              <div key={cat.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span style={{ color: cat.color }} className="flex shrink-0">
-                    <DynamicIcon name={cat.icon} size={13} />
+          {validData.length > 0 && (
+            <div className="flex flex-col gap-1.5 mt-2">
+              {validData.map((cat) => (
+                <div key={cat.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: cat.color }} className="flex shrink-0">
+                      <DynamicIcon name={cat.icon} size={13} />
+                    </span>
+                    <span className="text-zinc-400 text-xs">{cat.name}</span>
+                  </div>
+                  <span className="text-foreground text-xs font-medium">
+                    R$ {formatCurrency(Number(cat.value ?? 0))}
                   </span>
-                  <span className="text-zinc-400 text-xs">{cat.name}</span>
                 </div>
-                <span className="text-foreground text-xs font-medium">
-                  R$ {formatCurrency(cat.value ?? 0)}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
