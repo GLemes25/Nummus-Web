@@ -37,10 +37,18 @@ Use estes commits passados do repositório como seu padrão de tom e estrutura:
 - `merge: implement visual dashboard charts and category CRUD (dev -> main)`
 - `merge: fix CORS issues and add soft delete logic (feat/crud -> dev)`
 
-## 4. Fluxo de Execução
+## 4. Regras de Branch (CRÍTICO)
+
+- **NUNCA faça commit diretamente na branch `main`.** Todo trabalho deve ser feito na `dev` (ou em uma feature branch), e integrado à `main` apenas via merge explícito.
+- **SEMPRE retorne à branch `dev`** após realizar um merge na `main`. Após o merge e o push, execute `git checkout dev` imediatamente.
+- Se perceber que está na `main` prestes a commitar código que não seja um merge, mude para `dev` antes de prosseguir.
+
+## 5. Fluxo de Execução
 
 1. Analise brevemente os arquivos modificados (adicione-os ao _stage_ com `git add` se o usuário solicitar).
-2. Gere a mensagem de commit apropriada silenciosamente em inglês.
-3. Se a ação for uma mesclagem, analise os commits da branch de origem para extrair um resumo descritivo e aplique o formato obrigatório de merge.
-4. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
-5. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada.
+2. Confirme que está na branch correta (`dev` ou feature branch) antes de commitar. **Nunca commite na `main`.**
+3. Gere a mensagem de commit apropriada silenciosamente em inglês.
+4. Se a ação for uma mesclagem, analise os commits da branch de origem para extrair um resumo descritivo e aplique o formato obrigatório de merge.
+5. Execute automaticamente o comando do git: `git commit -m "<mensagem_gerada>"`
+6. Após um merge na `main`, execute `git checkout dev` imediatamente e confirme o retorno.
+7. Exiba uma breve confirmação de sucesso mostrando a mensagem que foi commitada e a branch atual.
