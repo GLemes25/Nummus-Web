@@ -7,7 +7,7 @@ import type { ExpenseByCategory } from "@/types/api";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 const formatCurrency = (value: number) =>
-  value.toLocaleString("pt-BR", {
+  (value ?? 0).toLocaleString("pt-BR", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
