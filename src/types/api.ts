@@ -63,3 +63,8 @@ export type TransactionsResponse = {
   data: Transaction[]
   meta: TransactionsMeta
 }
+
+export type NetWorthTrendPoint = {
+  month: string
+  balance: number
+}
