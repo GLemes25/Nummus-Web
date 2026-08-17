@@ -21,7 +21,7 @@ const CashFlowTooltip = ({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-lg border border-border/50 bg-popover px-3 py-2 shadow-xl">
+    <div className="rounded-lg border border-border/50 bg-card/90 backdrop-blur-md p-3 shadow-xl">
       <div className="text-foreground text-xs font-medium mb-1.5">{label}</div>
       <div className="flex flex-col gap-1">
         {payload.map((item) => (

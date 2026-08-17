@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet2, Bell, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
+import { TrendingUp, Bell, ChevronRight, CreditCard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import CashFlowChart from '@/components/dashboard/cash-flow-chart'
 import CustomTooltip from '@/components/dashboard/custom-tooltip'
+import SummaryCards from '@/components/dashboard/summary-cards'
 import WalletDetailsModal from '@/components/wallets/wallet-details-modal'
 import TransactionTypeDetailsModal from '@/components/transactions/transaction-type-details-modal'
 import { useWallets } from '@/hooks/use-wallets'
@@ -163,89 +164,13 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4 mb-5">
-        {[
-          {
-            label: 'Receita',
-            value: `R$ ${formatCurrency(monthlyIncome)}`,
-            change: 'este período',
-            type: 'income',
-            txType: 'INCOME' as const,
-            Icon: ArrowUpRight,
-          },
-          {
-            label: 'Despesas',
-            value: `R$ ${formatCurrency(monthlyExpenses)}`,
-            change: 'este período',
-            type: 'expense',
-            txType: 'EXPENSE' as const,
-            Icon: ArrowDownRight,
-          },
-          {
-            label: 'Economias',
-            value: `R$ ${formatCurrency(Math.max(savings, 0))}`,
-            change: 'saldo do período',
-            type: 'neutral',
-            txType: null,
-            Icon: Wallet2,
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.06 }}
-            className={`bg-card border border-border rounded-xl p-4 py-4.5 ${stat.txType ? 'cursor-pointer hover:bg-foreground/5 transition-colors' : ''}`}
-            onClick={stat.txType ? () => setSelectedTxType(stat.txType) : undefined}
-          >
-            <div className="flex justify-between mb-2.5">
-              <span className="text-muted-foreground text-sm">{stat.label}</span>
-              <div
-                className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-                style={{
-                  backgroundColor:
-                    stat.type === 'income'
-                      ? 'rgba(16,185,129,0.12)'
-                      : stat.type === 'expense'
-                        ? 'rgba(244,63,94,0.12)'
-                        : 'rgba(191,160,113,0.12)',
-                }}
-              >
-                <stat.Icon
-                  size={15}
-                  className={
-                    stat.type === 'income'
-                      ? 'text-income'
-                      : stat.type === 'expense'
-                        ? 'text-expense'
-                        : 'text-gold'
-                  }
-                />
-              </div>
-            </div>
-            {isTransactionsLoading ? (
-              <Loader2 size={16} className="animate-spin text-muted-foreground" />
-            ) : (
-              <>
-                <div className="text-foreground font-bold text-xl mb-1 tracking-tight">
-                  {stat.value}
-                </div>
-                <div
-                  className={
-                    stat.type === 'income'
-                      ? 'text-income text-xs'
-                      : stat.type === 'expense'
-                        ? 'text-expense text-xs'
-                        : 'text-gold text-xs'
-                  }
-                >
-                  {stat.change}
-                </div>
-              </>
-            )}
-          </motion.div>
-        ))}
-      </div>
+      <SummaryCards
+        monthlyIncome={monthlyIncome}
+        monthlyExpenses={monthlyExpenses}
+        savings={savings}
+        isLoading={isTransactionsLoading}
+        onSelectType={setSelectedTxType}
+      />
 
       <CashFlowChart />
 
