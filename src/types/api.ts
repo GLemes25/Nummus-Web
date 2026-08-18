@@ -10,6 +10,18 @@ export type Wallet = {
   updatedAt: string
 }
 
+export type CreditCard = {
+  id: string
+  name: string
+  creditLimit: number
+  closingDay: number
+  dueDay: number
+  currentInvoiceAmount: number
+  userId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type Category = {
   id: string
   name: string
