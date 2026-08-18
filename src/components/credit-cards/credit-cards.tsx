@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
-import { CreditCard as CreditCardIcon, Loader2 } from "lucide-react";
+import { CreditCard as CreditCardIcon, Loader2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,22 +12,34 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useCreditCards } from "@/hooks/use-credit-cards";
+import CreateCreditCardModal from "@/components/credit-cards/create-credit-card-modal";
 
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CreditCards = () => {
-  const { creditCards, isLoading, error } = useCreditCards();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { creditCards, isLoading, error, createCreditCard, isCreating } =
+    useCreditCards();
 
   return (
     <div className="p-6 pt-7 w-full max-w-225 mx-auto">
-      <div className="mb-6">
-        <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">
-          Cartões
-        </h1>
-        <p className="text-muted-foreground m-0 text-sm">
-          Acompanhe suas faturas e limites disponíveis
-        </p>
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-foreground m-0 mb-1 tracking-tight text-2xl font-bold">
+            Cartões
+          </h1>
+          <p className="text-muted-foreground m-0 text-sm">
+            Acompanhe suas faturas e limites disponíveis
+          </p>
+        </div>
+        <Button
+          className="bg-brand text-brand-foreground hover:bg-brand/90 gap-1.5"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus size={15} />
+          Novo Cartão
+        </Button>
       </div>
 
       {isLoading ? (
@@ -100,6 +114,13 @@ const CreditCards = () => {
           })}
         </div>
       )}
+
+      <CreateCreditCardModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreateCreditCard={createCreditCard}
+        isCreating={isCreating}
+      />
     </div>
   );
 };
