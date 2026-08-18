@@ -1,6 +1,7 @@
 "use client";
 
 import Categories from "@/components/categories/categories";
+import CreditCards from "@/components/credit-cards/credit-cards";
 import Dashboard from "@/components/dashboard/dashboard";
 import PricingTable from "@/components/premium/pricing-table";
 import UserProfile from "@/components/profile/user-profile";
@@ -14,6 +15,7 @@ import {
   Crown,
   LayoutDashboard,
   Plus,
+  Receipt,
   Tags,
   User,
   Wallet,
@@ -38,12 +40,16 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { id: "dashboard", label: "Painel", icon: LayoutDashboard },
-  { id: "transactions", label: "Transações", icon: CreditCard },
+  { id: "transactions", label: "Transações", icon: Receipt },
   { id: "wallets", label: "Carteiras", icon: Wallet },
+  { id: "credit-cards", label: "Cartões", icon: CreditCard },
   { id: "categories", label: "Categorias", icon: Tags },
   { id: "premium", label: "Premium", icon: Crown, badge: "PRO" },
   { id: "profile", label: "Perfil", icon: User },
 ];
+
+const mobileNavLeftIds: AppView[] = ["dashboard", "transactions"];
+const mobileNavRightIds: AppView[] = ["wallets", "credit-cards", "profile"];
 
 const AppLayout = ({
   currentView,
@@ -135,6 +141,7 @@ const AppLayout = ({
             />
           )}
           {currentView === "wallets" && <Wallets />}
+          {currentView === "credit-cards" && <CreditCards />}
           {currentView === "categories" && <Categories />}
           {currentView === "premium" && <PricingTable />}
           {currentView === "profile" && <UserProfile onLogout={onLogout} />}
@@ -143,25 +150,27 @@ const AppLayout = ({
     </main>
 
     <div className="flex lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border pb-6 pt-2.5 z-50 justify-around items-center">
-      {navItems.slice(0, 2).map((item) => {
-        const isActive = currentView === item.id;
-        const Icon = item.icon;
-        return (
-          <Button
-            key={item.id}
-            variant="ghost"
-            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
-            onClick={() => onNavigate(item.id)}
-          >
-            <Icon size={22} />
-            <span
-              className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+      {navItems
+        .filter((item) => mobileNavLeftIds.includes(item.id))
+        .map((item) => {
+          const isActive = currentView === item.id;
+          const Icon = item.icon;
+          return (
+            <Button
+              key={item.id}
+              variant="ghost"
+              className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
+              onClick={() => onNavigate(item.id)}
             >
-              {item.label}
-            </span>
-          </Button>
-        );
-      })}
+              <Icon size={22} />
+              <span
+                className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+              >
+                {item.label}
+              </span>
+            </Button>
+          );
+        })}
 
       <Button
         className="w-13.5 h-13.5 rounded-full p-0 shrink-0 mb-1"
@@ -175,25 +184,27 @@ const AppLayout = ({
         <Plus size={24} className="text-foreground" />
       </Button>
 
-      {[navItems[2], navItems[5]].map((item) => {
-        const isActive = currentView === item.id;
-        const Icon = item.icon;
-        return (
-          <Button
-            key={item.id}
-            variant="ghost"
-            className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
-            onClick={() => onNavigate(item.id)}
-          >
-            <Icon size={22} />
-            <span
-              className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+      {navItems
+        .filter((item) => mobileNavRightIds.includes(item.id))
+        .map((item) => {
+          const isActive = currentView === item.id;
+          const Icon = item.icon;
+          return (
+            <Button
+              key={item.id}
+              variant="ghost"
+              className={`flex flex-col items-center gap-1 px-3.5 py-1.5 h-auto ${isActive ? "text-brand" : "text-zinc-600"}`}
+              onClick={() => onNavigate(item.id)}
             >
-              {item.label}
-            </span>
-          </Button>
-        );
-      })}
+              <Icon size={22} />
+              <span
+                className={`text-[10px] ${isActive ? "font-medium" : "font-normal"}`}
+              >
+                {item.label}
+              </span>
+            </Button>
+          );
+        })}
     </div>
 
     <TransactionModal
