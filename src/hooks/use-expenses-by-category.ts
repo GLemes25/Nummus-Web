@@ -22,8 +22,9 @@ export const useExpensesByCategory = () => {
           setError("Falha ao carregar gastos por categoria")
           return
         }
-        return res.json().then((data: ExpenseByCategory[]) => {
-          setExpenses(data)
+        return res.json().then((json: { data: ExpenseByCategory[] } | ExpenseByCategory[]) => {
+          const expenses = Array.isArray(json) ? json : json.data ?? []
+          setExpenses(expenses)
         })
       })
       .catch(() => {
