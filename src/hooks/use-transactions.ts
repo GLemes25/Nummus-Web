@@ -17,7 +17,8 @@ export type CreateTransactionInput = {
   type: "INCOME" | "EXPENSE"
   paymentMethod: PaymentMethod
   description: string
-  walletId: string
+  walletId?: string
+  creditCardId?: string
   categoryId?: string
   date: string
 }

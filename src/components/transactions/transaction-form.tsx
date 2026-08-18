@@ -4,7 +4,13 @@ import { useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Loader2, Slash, Wallet as WalletIcon } from 'lucide-react'
+import {
+  CalendarIcon,
+  CreditCard as CreditCardIcon,
+  Loader2,
+  Slash,
+  Wallet as WalletIcon,
+} from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -23,15 +29,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
 import { useCategories } from '@/hooks/use-categories'
+import { useCreditCards } from '@/hooks/use-credit-cards'
 import { useWallets } from '@/hooks/use-wallets'
 import type { TransactionMutationResult } from '@/hooks/use-transactions'
 import { evaluateMathExpression } from '@/lib/evaluateMathExpression'
 import type { PaymentMethod } from '@/types/api'
+
+export const WALLET_ACCOUNT_PREFIX = 'wallet_'
+export const CREDIT_CARD_ACCOUNT_PREFIX = 'card_'
 
 const typeOptions = [
   { value: 'EXPENSE', label: 'Despesa' },
@@ -53,24 +65,33 @@ const isPlainNumber = (value: string) => /^\d+(\.\d+)?$/.test(value.trim())
 const formatCurrency = (value: number) =>
   value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-const transactionFormSchema = z.object({
-  type: z.enum(['INCOME', 'EXPENSE']),
-  amount: z.string().min(1, 'Informe um valor').refine(
-    (raw) => {
-      const evaluated = evaluateMathExpression(raw)
-      return evaluated !== null && evaluated > 0
-    },
-    { message: 'Informe um valor válido' }
-  ),
-  categoryId: z.string().optional(),
-  description: z.string().min(1, 'Informe uma descrição'),
-  paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD', 'CREDIT_CARD']),
-  walletId: z.string().min(1, 'Selecione uma carteira'),
-  date: z.date({ error: 'Selecione uma data válida' }),
-})
+const transactionFormSchema = z
+  .object({
+    type: z.enum(['INCOME', 'EXPENSE']),
+    amount: z.string().min(1, 'Informe um valor').refine(
+      (raw) => {
+        const evaluated = evaluateMathExpression(raw)
+        return evaluated !== null && evaluated > 0
+      },
+      { message: 'Informe um valor válido' }
+    ),
+    categoryId: z.string().optional(),
+    description: z.string().min(1, 'Informe uma descrição'),
+    paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD', 'CREDIT_CARD']),
+    accountId: z.string().min(1, 'Selecione uma carteira ou cartão'),
+    date: z.date({ error: 'Selecione uma data válida' }),
+  })
+  .refine(
+    (data) => data.type !== 'INCOME' || !data.accountId.startsWith(CREDIT_CARD_ACCOUNT_PREFIX),
+    { message: 'Não é possível lançar receita em cartão de crédito', path: ['accountId'] }
+  )
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>
-export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & { amount: number }
+export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount' | 'accountId'> & {
+  amount: number
+  walletId?: string
+  creditCardId?: string
+}
 
 type TransactionFormProps = {
   defaultValues?: Partial<TransactionFormValues>
@@ -90,6 +111,7 @@ const TransactionForm = ({
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const { wallets } = useWallets()
+  const { creditCards } = useCreditCards()
   const { categories } = useCategories()
 
   const form = useForm<TransactionFormValues>({
@@ -100,11 +122,13 @@ const TransactionForm = ({
       categoryId: undefined,
       description: '',
       paymentMethod: 'PIX',
-      walletId: wallets[0]?.id ?? '',
+      accountId: wallets[0] ? `${WALLET_ACCOUNT_PREFIX}${wallets[0].id}` : '',
       date: new Date(),
       ...defaultValues,
     },
   })
+
+  const watchedType = useWatch({ control: form.control, name: 'type' })
 
   const rawAmount = useWatch({ control: form.control, name: 'amount' })
   const livePreview = useMemo(() => {
@@ -119,7 +143,14 @@ const TransactionForm = ({
       setSubmitError('Informe um valor válido')
       return
     }
-    const result = await onSubmit({ ...values, amount })
+    const { accountId, ...rest } = values
+    const isCreditCardAccount = accountId.startsWith(CREDIT_CARD_ACCOUNT_PREFIX)
+    const result = await onSubmit({
+      ...rest,
+      amount,
+      walletId: isCreditCardAccount ? undefined : accountId.slice(WALLET_ACCOUNT_PREFIX.length),
+      creditCardId: isCreditCardAccount ? accountId.slice(CREDIT_CARD_ACCOUNT_PREFIX.length) : undefined,
+    })
     if (!result.success) {
       setSubmitError(result.error ?? 'Ocorreu um erro inesperado. Tente novamente.')
       return
@@ -148,7 +179,19 @@ const TransactionForm = ({
                       key={option.value}
                       type="button"
                       variant="ghost"
-                      onClick={() => field.onChange(option.value)}
+                      onClick={() => {
+                        field.onChange(option.value)
+                        if (option.value === 'INCOME') {
+                          const currentAccountId = form.getValues('accountId')
+                          if (currentAccountId?.startsWith(CREDIT_CARD_ACCOUNT_PREFIX)) {
+                            form.setValue(
+                              'accountId',
+                              wallets[0] ? `${WALLET_ACCOUNT_PREFIX}${wallets[0].id}` : '',
+                              { shouldValidate: true }
+                            )
+                          }
+                        }
+                      }}
                       className={`flex-1 h-auto py-2 rounded-lg font-normal hover:bg-transparent ${
                         isActive ? `${activeClass} font-semibold` : 'text-muted-foreground'
                       }`}
@@ -297,36 +340,68 @@ const TransactionForm = ({
 
         <FormField
           control={form.control}
-          name="walletId"
+          name="accountId"
           render={({ field }) => {
-            const selectedWallet = wallets.find((wallet) => wallet.id === field.value)
+            const selectedWallet = wallets.find(
+              (wallet) => `${WALLET_ACCOUNT_PREFIX}${wallet.id}` === field.value
+            )
+            const selectedCreditCard = creditCards.find(
+              (creditCard) => `${CREDIT_CARD_ACCOUNT_PREFIX}${creditCard.id}` === field.value
+            )
             return (
               <FormItem>
                 <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                  CARTEIRA
+                  CONTA
                 </FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione a carteira">
+                      <SelectValue placeholder="Selecione a carteira ou cartão">
                         {selectedWallet ? (
                           <span className="flex items-center gap-2">
                             <WalletIcon size={16} className="shrink-0" />
                             {selectedWallet.name}
+                          </span>
+                        ) : selectedCreditCard ? (
+                          <span className="flex items-center gap-2">
+                            <CreditCardIcon size={16} className="shrink-0" />
+                            {selectedCreditCard.name}
                           </span>
                         ) : undefined}
                       </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {wallets.map((wallet) => (
-                      <SelectItem key={wallet.id} value={wallet.id}>
-                        <span className="flex items-center gap-2">
-                          <WalletIcon size={16} className="shrink-0" />
-                          {wallet.name}
-                        </span>
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      <SelectLabel>Carteiras</SelectLabel>
+                      {wallets.map((wallet) => (
+                        <SelectItem
+                          key={wallet.id}
+                          value={`${WALLET_ACCOUNT_PREFIX}${wallet.id}`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <WalletIcon size={16} className="shrink-0" />
+                            {wallet.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    {watchedType !== 'INCOME' && creditCards.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Cartões de Crédito</SelectLabel>
+                        {creditCards.map((creditCard) => (
+                          <SelectItem
+                            key={creditCard.id}
+                            value={`${CREDIT_CARD_ACCOUNT_PREFIX}${creditCard.id}`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <CreditCardIcon size={16} className="shrink-0" />
+                              {creditCard.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
