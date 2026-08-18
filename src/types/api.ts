@@ -69,6 +69,12 @@ export type NetWorthTrendPoint = {
   balance: number
 }
 
+export type NetWorthSummary = {
+  netWorth: number
+  assets: number
+  liabilities: number
+}
+
 export type ExpenseByCategory = {
   name: string
   amount: number
