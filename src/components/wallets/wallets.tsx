@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useNetWorth } from '@/hooks/use-net-worth';
 import { useWallets } from '@/hooks/use-wallets';
 import AddWalletModal from '@/components/wallets/add-wallet-modal';
 import AdjustBalanceModal from '@/components/wallets/adjust-balance-modal';
@@ -53,10 +54,7 @@ const Wallets = () => {
     deleteWallet,
     isDeleting,
   } = useWallets();
-
-  const totalAssets = wallets.filter((w) => w.balance > 0).reduce((s, w) => s + w.balance, 0);
-  const totalLiabilities = wallets.filter((w) => w.balance < 0).reduce((s, w) => s + Math.abs(w.balance), 0);
-  const netWorth = totalAssets - totalLiabilities;
+  const { summary, isLoading: isSummaryLoading } = useNetWorth();
 
   return (
     <div className="p-6 pt-7 w-full max-w-225 mx-auto">
@@ -80,13 +78,19 @@ const Wallets = () => {
 
       <div className="grid grid-cols-3 gap-3 mb-6">
         {[
-          { label: 'Patrimônio Líquido', value: `$${netWorth.toLocaleString()}`, colorClass: 'text-gold' },
-          { label: 'Total de Ativos', value: `$${totalAssets.toLocaleString()}`, colorClass: 'text-income' },
-          { label: 'Passivos', value: `-$${totalLiabilities.toLocaleString()}`, colorClass: 'text-expense' },
+          { label: 'Patrimônio Líquido', value: summary.netWorth, colorClass: 'text-gold' },
+          { label: 'Total de Ativos', value: summary.assets, colorClass: 'text-income' },
+          { label: 'Passivos', value: summary.liabilities, colorClass: 'text-expense' },
         ].map((s) => (
           <div key={s.label} className="bg-card border border-border rounded-xl px-4 py-3.5">
             <div className="text-muted-foreground text-xs mb-1.5">{s.label}</div>
-            <div className={`${s.colorClass} font-bold text-lg tracking-tight`}>{s.value}</div>
+            {isSummaryLoading ? (
+              <Loader2 size={16} className="animate-spin text-muted-foreground" />
+            ) : (
+              <div className={`${s.colorClass} font-bold text-lg tracking-tight`}>
+                {(s.value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </div>
+            )}
           </div>
         ))}
       </div>
