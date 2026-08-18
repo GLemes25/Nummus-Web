@@ -71,7 +71,7 @@ export type NetWorthTrendPoint = {
 
 export type ExpenseByCategory = {
   name: string
-  value: number
+  amount: number
   color: string
   icon: string
 }

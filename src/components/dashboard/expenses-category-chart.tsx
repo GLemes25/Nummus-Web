@@ -32,7 +32,7 @@ const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
         <span className="text-foreground font-medium">{entry.name}</span>
       </div>
       <span className="text-muted-foreground">
-        R$ {formatCurrency(entry.value ?? 0)}
+        R$ {formatCurrency(entry.amount ?? 0)}
       </span>
     </div>
   );
@@ -40,7 +40,7 @@ const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
 
 const GHOST_ENTRY: ChartEntry = {
   name: "Nenhum gasto",
-  value: 0,
+  amount: 0,
   chartValue: 1,
   color: "#71717a",
   icon: "minus",
@@ -56,11 +56,11 @@ const ExpensesCategoryChart = () => {
     currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1);
 
   const validData = Array.isArray(data)
-    ? data.filter((item) => Number(item.value) > 0)
+    ? data.filter((item) => Number(item.amount) > 0)
     : [];
   const chartData: ChartEntry[] =
     validData.length > 0
-      ? validData.map((d) => ({ ...d, chartValue: Number(d.value) }))
+      ? validData.map((d) => ({ ...d, chartValue: Number(d.amount) }))
       : [GHOST_ENTRY];
 
   return (
@@ -116,7 +116,7 @@ const ExpensesCategoryChart = () => {
                     <span className="text-zinc-400 text-xs">{cat.name}</span>
                   </div>
                   <span className="text-foreground text-xs font-medium">
-                    R$ {formatCurrency(Number(cat.value ?? 0))}
+                    R$ {formatCurrency(Number(cat.amount ?? 0))}
                   </span>
                 </div>
               ))}
