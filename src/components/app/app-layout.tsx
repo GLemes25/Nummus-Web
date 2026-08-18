@@ -1,5 +1,6 @@
 "use client";
 
+import Categories from "@/components/categories/categories";
 import Dashboard from "@/components/dashboard/dashboard";
 import PricingTable from "@/components/premium/pricing-table";
 import UserProfile from "@/components/profile/user-profile";
@@ -13,6 +14,7 @@ import {
   Crown,
   LayoutDashboard,
   Plus,
+  Tags,
   User,
   Wallet,
 } from "lucide-react";
@@ -38,6 +40,7 @@ const navItems: NavItem[] = [
   { id: "dashboard", label: "Painel", icon: LayoutDashboard },
   { id: "transactions", label: "Transações", icon: CreditCard },
   { id: "wallets", label: "Carteiras", icon: Wallet },
+  { id: "categories", label: "Categorias", icon: Tags },
   { id: "premium", label: "Premium", icon: Crown, badge: "PRO" },
   { id: "profile", label: "Perfil", icon: User },
 ];
@@ -132,6 +135,7 @@ const AppLayout = ({
             />
           )}
           {currentView === "wallets" && <Wallets />}
+          {currentView === "categories" && <Categories />}
           {currentView === "premium" && <PricingTable />}
           {currentView === "profile" && <UserProfile onLogout={onLogout} />}
         </motion.div>
@@ -171,7 +175,7 @@ const AppLayout = ({
         <Plus size={24} className="text-foreground" />
       </Button>
 
-      {[navItems[2], navItems[4]].map((item) => {
+      {[navItems[2], navItems[5]].map((item) => {
         const isActive = currentView === item.id;
         const Icon = item.icon;
         return (
