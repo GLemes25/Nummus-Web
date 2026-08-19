@@ -13,12 +13,15 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { useCreditCards } from "@/hooks/use-credit-cards";
 import CreateCreditCardModal from "@/components/credit-cards/create-credit-card-modal";
+import CreditCardDetailsModal from "@/components/credit-cards/credit-card-details-modal";
+import type { CreditCard as CreditCardType } from "@/types/api";
 
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CreditCards = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedCreditCard, setSelectedCreditCard] = useState<CreditCardType | null>(null);
   const { creditCards, isLoading, error, createCreditCard, isCreating } =
     useCreditCards();
 
@@ -73,7 +76,10 @@ const CreditCards = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
               >
-                <Card>
+                <Card
+                  className="cursor-pointer hover:border-brand/40 transition-colors"
+                  onClick={() => setSelectedCreditCard(creditCard)}
+                >
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="w-9.5 h-9.5 rounded-[10px] bg-brand/10 flex items-center justify-center shrink-0">
@@ -120,6 +126,12 @@ const CreditCards = () => {
         onClose={() => setIsCreateModalOpen(false)}
         onCreateCreditCard={createCreditCard}
         isCreating={isCreating}
+      />
+
+      <CreditCardDetailsModal
+        creditCard={selectedCreditCard}
+        isOpen={!!selectedCreditCard}
+        onClose={() => setSelectedCreditCard(null)}
       />
     </div>
   );
