@@ -1,7 +1,6 @@
 "use client";
 
 import Categories from "@/components/categories/categories";
-import CreditCards from "@/components/credit-cards/credit-cards";
 import Dashboard from "@/components/dashboard/dashboard";
 import PricingTable from "@/components/premium/pricing-table";
 import UserProfile from "@/components/profile/user-profile";
@@ -11,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import Wallets from "@/components/wallets/wallets";
 import type { AppView } from "@/types/app";
 import {
-  CreditCard,
   Crown,
   LayoutDashboard,
   Plus,
@@ -42,14 +40,13 @@ const navItems: NavItem[] = [
   { id: "dashboard", label: "Painel", icon: LayoutDashboard },
   { id: "transactions", label: "Transações", icon: Receipt },
   { id: "wallets", label: "Carteiras", icon: Wallet },
-  { id: "credit-cards", label: "Cartões", icon: CreditCard },
   { id: "categories", label: "Categorias", icon: Tags },
   { id: "premium", label: "Premium", icon: Crown, badge: "PRO" },
   { id: "profile", label: "Perfil", icon: User },
 ];
 
 const mobileNavLeftIds: AppView[] = ["dashboard", "transactions"];
-const mobileNavRightIds: AppView[] = ["wallets", "credit-cards", "profile"];
+const mobileNavRightIds: AppView[] = ["wallets", "profile"];
 
 const AppLayout = ({
   currentView,
@@ -141,7 +138,6 @@ const AppLayout = ({
             />
           )}
           {currentView === "wallets" && <Wallets />}
-          {currentView === "credit-cards" && <CreditCards />}
           {currentView === "categories" && <Categories />}
           {currentView === "premium" && <PricingTable />}
           {currentView === "profile" && <UserProfile onLogout={onLogout} />}
