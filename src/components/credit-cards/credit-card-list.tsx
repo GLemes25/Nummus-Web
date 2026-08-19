@@ -1,13 +1,26 @@
 "use client";
 
 import { motion } from "motion/react";
-import { CreditCard as CreditCardIcon, Loader2 } from "lucide-react";
+import {
+  CreditCard as CreditCardIcon,
+  Edit3,
+  Loader2,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import type { CreditCard } from "@/types/api";
 
@@ -16,6 +29,8 @@ type CreditCardListProps = {
   isLoading: boolean;
   error: string | null;
   onSelectCreditCard: (creditCard: CreditCard) => void;
+  onEditCreditCard: (creditCard: CreditCard) => void;
+  onDeleteCreditCard: (creditCard: CreditCard) => void;
 };
 
 const formatCurrency = (value: number) =>
@@ -26,6 +41,8 @@ const CreditCardList = ({
   isLoading,
   error,
   onSelectCreditCard,
+  onEditCreditCard,
+  onDeleteCreditCard,
 }: CreditCardListProps) => {
   if (isLoading) {
     return (
@@ -73,11 +90,56 @@ const CreditCardList = ({
               onClick={() => onSelectCreditCard(creditCard)}
             >
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-9.5 h-9.5 rounded-[10px] bg-brand/10 flex items-center justify-center shrink-0">
-                    <CreditCardIcon size={18} className="text-brand" />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9.5 h-9.5 rounded-[10px] bg-brand/10 flex items-center justify-center shrink-0">
+                      <CreditCardIcon size={18} className="text-brand" />
+                    </div>
+                    <CardTitle className="truncate">
+                      {creditCard.name}
+                    </CardTitle>
                   </div>
-                  <CardTitle>{creditCard.name}</CardTitle>
+
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-7.5 h-7.5 shrink-0 text-muted-foreground hover:text-foreground"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreHorizontal size={16} />
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditCreditCard(creditCard);
+                          }}
+                        >
+                          <Edit3 size={14} />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteCreditCard(creditCard);
+                          }}
+                        >
+                          <Trash2 size={14} />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">

@@ -31,6 +31,8 @@ import WalletDetailsModal from '@/components/wallets/wallet-details-modal';
 import CreditCardList from '@/components/credit-cards/credit-card-list';
 import CreateCreditCardModal from '@/components/credit-cards/create-credit-card-modal';
 import CreditCardDetailsModal from '@/components/credit-cards/credit-card-details-modal';
+import EditCreditCardModal from '@/components/credit-cards/edit-credit-card-modal';
+import DeleteCreditCardAlert from '@/components/credit-cards/delete-credit-card-alert';
 import type { CreditCard as CreditCardType, Wallet } from '@/types/api';
 
 const walletGradients = [
@@ -49,6 +51,10 @@ const Wallets = () => {
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
   const [isCreateCreditCardOpen, setIsCreateCreditCardOpen] = useState(false);
   const [selectedCreditCard, setSelectedCreditCard] =
+    useState<CreditCardType | null>(null);
+  const [cardBeingEdited, setCardBeingEdited] =
+    useState<CreditCardType | null>(null);
+  const [cardBeingDeleted, setCardBeingDeleted] =
     useState<CreditCardType | null>(null);
   const {
     wallets,
@@ -69,6 +75,10 @@ const Wallets = () => {
     error: creditCardsError,
     createCreditCard,
     isCreating: isCreatingCreditCard,
+    updateCreditCard,
+    isUpdating: isUpdatingCreditCard,
+    deleteCreditCard,
+    isDeleting: isDeletingCreditCard,
   } = useCreditCards();
 
   return (
@@ -217,6 +227,8 @@ const Wallets = () => {
             isLoading={isLoadingCreditCards}
             error={creditCardsError}
             onSelectCreditCard={setSelectedCreditCard}
+            onEditCreditCard={setCardBeingEdited}
+            onDeleteCreditCard={setCardBeingDeleted}
           />
         </TabsContent>
       </Tabs>
@@ -259,6 +271,21 @@ const Wallets = () => {
         creditCard={selectedCreditCard}
         isOpen={!!selectedCreditCard}
         onClose={() => setSelectedCreditCard(null)}
+      />
+
+      <EditCreditCardModal
+        isOpen={!!cardBeingEdited}
+        onClose={() => setCardBeingEdited(null)}
+        creditCard={cardBeingEdited}
+        onUpdateCreditCard={updateCreditCard}
+        isUpdating={isUpdatingCreditCard}
+      />
+
+      <DeleteCreditCardAlert
+        creditCard={cardBeingDeleted}
+        onClose={() => setCardBeingDeleted(null)}
+        onDeleteCreditCard={deleteCreditCard}
+        isDeleting={isDeletingCreditCard}
       />
 
       <AlertDialog

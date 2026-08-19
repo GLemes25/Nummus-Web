@@ -11,11 +11,20 @@ type CreateCreditCardInput = {
   dueDay: number
 }
 
+type UpdateCreditCardInput = {
+  name: string
+  creditLimit: number
+  closingDay: number
+  dueDay: number
+}
+
 export const useCreditCards = () => {
   const [creditCards, setCreditCards] = useState<CreditCard[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const fetchCreditCards = useCallback(() => {
     return Promise.resolve()
@@ -59,6 +68,40 @@ export const useCreditCards = () => {
     [fetchCreditCards]
   )
 
+  const updateCreditCard = useCallback(
+    async (id: string, input: UpdateCreditCardInput): Promise<boolean> => {
+      setIsUpdating(true)
+      try {
+        const res = await apiClient.patch(`/credit-cards/${id}`, input)
+        if (!res || !res.ok) return false
+        await fetchCreditCards()
+        return true
+      } catch {
+        return false
+      } finally {
+        setIsUpdating(false)
+      }
+    },
+    [fetchCreditCards]
+  )
+
+  const deleteCreditCard = useCallback(
+    async (id: string): Promise<boolean> => {
+      setIsDeleting(true)
+      try {
+        const res = await apiClient.delete(`/credit-cards/${id}`)
+        if (!res || !res.ok) return false
+        await fetchCreditCards()
+        return true
+      } catch {
+        return false
+      } finally {
+        setIsDeleting(false)
+      }
+    },
+    [fetchCreditCards]
+  )
+
   useEffect(() => {
     fetchCreditCards()
   }, [fetchCreditCards])
@@ -70,5 +113,9 @@ export const useCreditCards = () => {
     refetch: fetchCreditCards,
     createCreditCard,
     isCreating,
+    updateCreditCard,
+    isUpdating,
+    deleteCreditCard,
+    isDeleting,
   }
 }
