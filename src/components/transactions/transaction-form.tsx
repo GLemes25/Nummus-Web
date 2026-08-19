@@ -48,9 +48,9 @@ const typeOptions = [
 const paymentMethodOptions: { value: PaymentMethod; label: string }[] = [
   { value: 'PIX', label: 'Pix' },
   { value: 'CASH', label: 'Dinheiro' },
-  { value: 'BANK_TRANSFER', label: 'Transferência' },
-  { value: 'DEBIT_CARD', label: 'Débito' },
-  { value: 'CREDIT_CARD', label: 'Crédito' },
+  { value: 'TRANSFER', label: 'Transferência' },
+  { value: 'DEBIT', label: 'Débito' },
+  { value: 'CREDIT', label: 'Crédito' },
 ]
 
 const NO_CATEGORY = '__none__'
@@ -72,20 +72,20 @@ const transactionFormSchema = z
     ),
     categoryId: z.string().optional(),
     description: z.string().min(1, 'Informe uma descrição'),
-    paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD', 'CREDIT_CARD']),
+    paymentMethod: z.enum(['CASH', 'PIX', 'TRANSFER', 'DEBIT', 'CREDIT']),
     walletId: z.string().optional(),
     creditCardId: z.string().optional(),
     date: z.date({ error: 'Selecione uma data válida' }),
   })
-  .refine((data) => data.type !== 'INCOME' || data.paymentMethod !== 'CREDIT_CARD', {
+  .refine((data) => data.type !== 'INCOME' || data.paymentMethod !== 'CREDIT', {
     message: 'Não é possível lançar receita em cartão de crédito',
     path: ['paymentMethod'],
   })
-  .refine((data) => data.paymentMethod !== 'CREDIT_CARD' || !!data.creditCardId, {
+  .refine((data) => data.paymentMethod !== 'CREDIT' || !!data.creditCardId, {
     message: 'Selecione um cartão de crédito',
     path: ['creditCardId'],
   })
-  .refine((data) => data.paymentMethod === 'CREDIT_CARD' || !!data.walletId, {
+  .refine((data) => data.paymentMethod === 'CREDIT' || !!data.walletId, {
     message: 'Selecione uma carteira',
     path: ['walletId'],
   })
@@ -133,12 +133,12 @@ const TransactionForm = ({
 
   const watchedType = useWatch({ control: form.control, name: 'type' })
   const watchedPaymentMethod = useWatch({ control: form.control, name: 'paymentMethod' })
-  const isCreditCardPayment = watchedPaymentMethod === 'CREDIT_CARD'
+  const isCreditCardPayment = watchedPaymentMethod === 'CREDIT'
 
   const availablePaymentMethodOptions = useMemo(
     () =>
       watchedType === 'INCOME'
-        ? paymentMethodOptions.filter((option) => option.value !== 'CREDIT_CARD')
+        ? paymentMethodOptions.filter((option) => option.value !== 'CREDIT')
         : paymentMethodOptions,
     [watchedType]
   )
@@ -156,7 +156,7 @@ const TransactionForm = ({
       setSubmitError('Informe um valor válido')
       return
     }
-    const isCreditCardAccount = values.paymentMethod === 'CREDIT_CARD'
+    const isCreditCardAccount = values.paymentMethod === 'CREDIT'
     const result = await onSubmit({
       ...values,
       amount,
@@ -193,7 +193,7 @@ const TransactionForm = ({
                       variant="ghost"
                       onClick={() => {
                         field.onChange(option.value)
-                        if (option.value === 'INCOME' && form.getValues('paymentMethod') === 'CREDIT_CARD') {
+                        if (option.value === 'INCOME' && form.getValues('paymentMethod') === 'CREDIT') {
                           form.setValue('paymentMethod', 'PIX', { shouldValidate: true })
                           form.setValue('creditCardId', undefined)
                           form.setValue('walletId', wallets[0]?.id ?? '', { shouldValidate: true })
@@ -328,7 +328,7 @@ const TransactionForm = ({
                 onValueChange={(value: PaymentMethod | null) => {
                   if (!value) return
                   field.onChange(value)
-                  if (value === 'CREDIT_CARD') {
+                  if (value === 'CREDIT') {
                     form.setValue('walletId', undefined, { shouldValidate: true })
                   } else {
                     form.setValue('creditCardId', undefined)

@@ -34,7 +34,7 @@ export type Category = {
 }
 
 export type TransactionType = "INCOME" | "EXPENSE" | "BALANCE_ADJUSTMENT"
-export type PaymentMethod = "CASH" | "PIX" | "BANK_TRANSFER" | "DEBIT_CARD" | "CREDIT_CARD"
+export type PaymentMethod = "CASH" | "PIX" | "TRANSFER" | "DEBIT" | "CREDIT"
 export type TransactionStatus = "PENDING" | "COMPLETED" | "CANCELLED"
 
 export type Transaction = {
