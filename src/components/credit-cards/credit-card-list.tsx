@@ -6,6 +6,7 @@ import {
   Edit3,
   Loader2,
   MoreHorizontal,
+  Receipt,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ type CreditCardListProps = {
   onSelectCreditCard: (creditCard: CreditCard) => void;
   onEditCreditCard: (creditCard: CreditCard) => void;
   onDeleteCreditCard: (creditCard: CreditCard) => void;
+  onPayInvoice: (creditCard: CreditCard) => void;
 };
 
 const formatCurrency = (value: number) =>
@@ -43,6 +45,7 @@ const CreditCardList = ({
   onSelectCreditCard,
   onEditCreditCard,
   onDeleteCreditCard,
+  onPayInvoice,
 }: CreditCardListProps) => {
   if (isLoading) {
     return (
@@ -169,6 +172,20 @@ const CreditCardList = ({
                 <div className="text-muted-foreground text-xs">
                   Vence dia {creditCard.dueDay}
                 </div>
+
+                {creditCard.currentInvoiceAmount > 0 && (
+                  <Button
+                    variant="secondary"
+                    className="w-full gap-1.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPayInvoice(creditCard);
+                    }}
+                  >
+                    <Receipt size={14} />
+                    Pagar Fatura
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </motion.div>

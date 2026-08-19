@@ -33,6 +33,7 @@ import CreateCreditCardModal from '@/components/credit-cards/create-credit-card-
 import CreditCardDetailsModal from '@/components/credit-cards/credit-card-details-modal';
 import EditCreditCardModal from '@/components/credit-cards/edit-credit-card-modal';
 import DeleteCreditCardAlert from '@/components/credit-cards/delete-credit-card-alert';
+import PayInvoiceModal from '@/components/credit-cards/pay-invoice-modal';
 import type { CreditCard as CreditCardType, Wallet } from '@/types/api';
 
 const walletGradients = [
@@ -55,6 +56,8 @@ const Wallets = () => {
   const [cardBeingEdited, setCardBeingEdited] =
     useState<CreditCardType | null>(null);
   const [cardBeingDeleted, setCardBeingDeleted] =
+    useState<CreditCardType | null>(null);
+  const [cardBeingPaid, setCardBeingPaid] =
     useState<CreditCardType | null>(null);
   const {
     wallets,
@@ -79,7 +82,15 @@ const Wallets = () => {
     isUpdating: isUpdatingCreditCard,
     deleteCreditCard,
     isDeleting: isDeletingCreditCard,
+    payInvoice,
+    isPayingInvoice,
   } = useCreditCards();
+
+  const handlePayInvoice = async (creditCardId: string, walletId: string) => {
+    const isSuccess = await payInvoice(creditCardId, walletId);
+    if (isSuccess) await refetch();
+    return isSuccess;
+  };
 
   return (
     <div className="p-6 pt-7 w-full max-w-225 mx-auto">
@@ -229,6 +240,7 @@ const Wallets = () => {
             onSelectCreditCard={setSelectedCreditCard}
             onEditCreditCard={setCardBeingEdited}
             onDeleteCreditCard={setCardBeingDeleted}
+            onPayInvoice={setCardBeingPaid}
           />
         </TabsContent>
       </Tabs>
@@ -286,6 +298,16 @@ const Wallets = () => {
         onClose={() => setCardBeingDeleted(null)}
         onDeleteCreditCard={deleteCreditCard}
         isDeleting={isDeletingCreditCard}
+      />
+
+      <PayInvoiceModal
+        isOpen={!!cardBeingPaid}
+        onClose={() => setCardBeingPaid(null)}
+        creditCard={cardBeingPaid}
+        wallets={wallets}
+        isLoadingWallets={isLoading}
+        onPayInvoice={handlePayInvoice}
+        isPaying={isPayingInvoice}
       />
 
       <AlertDialog

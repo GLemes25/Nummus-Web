@@ -25,6 +25,7 @@ export const useCreditCards = () => {
   const [isCreating, setIsCreating] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isPayingInvoice, setIsPayingInvoice] = useState(false)
 
   const fetchCreditCards = useCallback(() => {
     return Promise.resolve()
@@ -102,6 +103,25 @@ export const useCreditCards = () => {
     [fetchCreditCards]
   )
 
+  const payInvoice = useCallback(
+    async (creditCardId: string, walletId: string): Promise<boolean> => {
+      setIsPayingInvoice(true)
+      try {
+        const res = await apiClient.post(`/credit-cards/${creditCardId}/pay`, {
+          walletId,
+        })
+        if (!res || !res.ok) return false
+        await fetchCreditCards()
+        return true
+      } catch {
+        return false
+      } finally {
+        setIsPayingInvoice(false)
+      }
+    },
+    [fetchCreditCards]
+  )
+
   useEffect(() => {
     fetchCreditCards()
   }, [fetchCreditCards])
@@ -117,5 +137,7 @@ export const useCreditCards = () => {
     isUpdating,
     deleteCreditCard,
     isDeleting,
+    payInvoice,
+    isPayingInvoice,
   }
 }
