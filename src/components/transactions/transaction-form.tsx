@@ -29,9 +29,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -41,9 +39,6 @@ import { useWallets } from '@/hooks/use-wallets'
 import type { TransactionMutationResult } from '@/hooks/use-transactions'
 import { evaluateMathExpression } from '@/lib/evaluateMathExpression'
 import type { PaymentMethod } from '@/types/api'
-
-export const WALLET_ACCOUNT_PREFIX = 'wallet_'
-export const CREDIT_CARD_ACCOUNT_PREFIX = 'card_'
 
 const typeOptions = [
   { value: 'EXPENSE', label: 'Despesa' },
@@ -78,19 +73,26 @@ const transactionFormSchema = z
     categoryId: z.string().optional(),
     description: z.string().min(1, 'Informe uma descrição'),
     paymentMethod: z.enum(['CASH', 'PIX', 'BANK_TRANSFER', 'DEBIT_CARD', 'CREDIT_CARD']),
-    accountId: z.string().min(1, 'Selecione uma carteira ou cartão'),
+    walletId: z.string().optional(),
+    creditCardId: z.string().optional(),
     date: z.date({ error: 'Selecione uma data válida' }),
   })
-  .refine(
-    (data) => data.type !== 'INCOME' || !data.accountId.startsWith(CREDIT_CARD_ACCOUNT_PREFIX),
-    { message: 'Não é possível lançar receita em cartão de crédito', path: ['accountId'] }
-  )
+  .refine((data) => data.type !== 'INCOME' || data.paymentMethod !== 'CREDIT_CARD', {
+    message: 'Não é possível lançar receita em cartão de crédito',
+    path: ['paymentMethod'],
+  })
+  .refine((data) => data.paymentMethod !== 'CREDIT_CARD' || !!data.creditCardId, {
+    message: 'Selecione um cartão de crédito',
+    path: ['creditCardId'],
+  })
+  .refine((data) => data.paymentMethod === 'CREDIT_CARD' || !!data.walletId, {
+    message: 'Selecione uma carteira',
+    path: ['walletId'],
+  })
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>
-export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount' | 'accountId'> & {
+export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & {
   amount: number
-  walletId?: string
-  creditCardId?: string
 }
 
 type TransactionFormProps = {
@@ -122,13 +124,24 @@ const TransactionForm = ({
       categoryId: undefined,
       description: '',
       paymentMethod: 'PIX',
-      accountId: wallets[0] ? `${WALLET_ACCOUNT_PREFIX}${wallets[0].id}` : '',
+      walletId: wallets[0]?.id ?? '',
+      creditCardId: undefined,
       date: new Date(),
       ...defaultValues,
     },
   })
 
   const watchedType = useWatch({ control: form.control, name: 'type' })
+  const watchedPaymentMethod = useWatch({ control: form.control, name: 'paymentMethod' })
+  const isCreditCardPayment = watchedPaymentMethod === 'CREDIT_CARD'
+
+  const availablePaymentMethodOptions = useMemo(
+    () =>
+      watchedType === 'INCOME'
+        ? paymentMethodOptions.filter((option) => option.value !== 'CREDIT_CARD')
+        : paymentMethodOptions,
+    [watchedType]
+  )
 
   const rawAmount = useWatch({ control: form.control, name: 'amount' })
   const livePreview = useMemo(() => {
@@ -143,13 +156,12 @@ const TransactionForm = ({
       setSubmitError('Informe um valor válido')
       return
     }
-    const { accountId, ...rest } = values
-    const isCreditCardAccount = accountId.startsWith(CREDIT_CARD_ACCOUNT_PREFIX)
+    const isCreditCardAccount = values.paymentMethod === 'CREDIT_CARD'
     const result = await onSubmit({
-      ...rest,
+      ...values,
       amount,
-      walletId: isCreditCardAccount ? undefined : accountId.slice(WALLET_ACCOUNT_PREFIX.length),
-      creditCardId: isCreditCardAccount ? accountId.slice(CREDIT_CARD_ACCOUNT_PREFIX.length) : undefined,
+      walletId: isCreditCardAccount ? undefined : values.walletId,
+      creditCardId: isCreditCardAccount ? values.creditCardId : undefined,
     })
     if (!result.success) {
       setSubmitError(result.error ?? 'Ocorreu um erro inesperado. Tente novamente.')
@@ -181,15 +193,10 @@ const TransactionForm = ({
                       variant="ghost"
                       onClick={() => {
                         field.onChange(option.value)
-                        if (option.value === 'INCOME') {
-                          const currentAccountId = form.getValues('accountId')
-                          if (currentAccountId?.startsWith(CREDIT_CARD_ACCOUNT_PREFIX)) {
-                            form.setValue(
-                              'accountId',
-                              wallets[0] ? `${WALLET_ACCOUNT_PREFIX}${wallets[0].id}` : '',
-                              { shouldValidate: true }
-                            )
-                          }
+                        if (option.value === 'INCOME' && form.getValues('paymentMethod') === 'CREDIT_CARD') {
+                          form.setValue('paymentMethod', 'PIX', { shouldValidate: true })
+                          form.setValue('creditCardId', undefined)
+                          form.setValue('walletId', wallets[0]?.id ?? '', { shouldValidate: true })
                         }
                       }}
                       className={`flex-1 h-auto py-2 rounded-lg font-normal hover:bg-transparent ${
@@ -313,20 +320,31 @@ const TransactionForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                FORMA DE PAGAMENTO
+                MÉTODO DE PAGAMENTO
               </FormLabel>
               <Select
-                items={paymentMethodOptions}
+                items={availablePaymentMethodOptions}
                 value={field.value}
-                onValueChange={field.onChange}
+                onValueChange={(value: PaymentMethod | null) => {
+                  if (!value) return
+                  field.onChange(value)
+                  if (value === 'CREDIT_CARD') {
+                    form.setValue('walletId', undefined, { shouldValidate: true })
+                  } else {
+                    form.setValue('creditCardId', undefined)
+                    if (!form.getValues('walletId')) {
+                      form.setValue('walletId', wallets[0]?.id ?? '', { shouldValidate: true })
+                    }
+                  }
+                }}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione a forma de pagamento" />
+                    <SelectValue placeholder="Selecione o método de pagamento" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {paymentMethodOptions.map((option) => (
+                  {availablePaymentMethodOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -338,77 +356,87 @@ const TransactionForm = ({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="accountId"
-          render={({ field }) => {
-            const selectedWallet = wallets.find(
-              (wallet) => `${WALLET_ACCOUNT_PREFIX}${wallet.id}` === field.value
-            )
-            const selectedCreditCard = creditCards.find(
-              (creditCard) => `${CREDIT_CARD_ACCOUNT_PREFIX}${creditCard.id}` === field.value
-            )
-            return (
-              <FormItem>
-                <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                  CONTA
-                </FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione a carteira ou cartão">
-                        {selectedWallet ? (
-                          <span className="flex items-center gap-2">
-                            <WalletIcon size={16} className="shrink-0" />
-                            {selectedWallet.name}
-                          </span>
-                        ) : selectedCreditCard ? (
+        {isCreditCardPayment ? (
+          <FormField
+            control={form.control}
+            name="creditCardId"
+            render={({ field }) => {
+              const selectedCreditCard = creditCards.find((creditCard) => creditCard.id === field.value)
+              return (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    CARTÃO DE CRÉDITO
+                  </FormLabel>
+                  <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o cartão">
+                          {selectedCreditCard && (
+                            <span className="flex items-center gap-2">
+                              <CreditCardIcon size={16} className="shrink-0" />
+                              {selectedCreditCard.name}
+                            </span>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {creditCards.map((creditCard) => (
+                        <SelectItem key={creditCard.id} value={creditCard.id}>
                           <span className="flex items-center gap-2">
                             <CreditCardIcon size={16} className="shrink-0" />
-                            {selectedCreditCard.name}
+                            {creditCard.name}
                           </span>
-                        ) : undefined}
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Carteiras</SelectLabel>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
+          />
+        ) : (
+          <FormField
+            control={form.control}
+            name="walletId"
+            render={({ field }) => {
+              const selectedWallet = wallets.find((wallet) => wallet.id === field.value)
+              return (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    CARTEIRA
+                  </FormLabel>
+                  <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione a carteira">
+                          {selectedWallet && (
+                            <span className="flex items-center gap-2">
+                              <WalletIcon size={16} className="shrink-0" />
+                              {selectedWallet.name}
+                            </span>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
                       {wallets.map((wallet) => (
-                        <SelectItem
-                          key={wallet.id}
-                          value={`${WALLET_ACCOUNT_PREFIX}${wallet.id}`}
-                        >
+                        <SelectItem key={wallet.id} value={wallet.id}>
                           <span className="flex items-center gap-2">
                             <WalletIcon size={16} className="shrink-0" />
                             {wallet.name}
                           </span>
                         </SelectItem>
                       ))}
-                    </SelectGroup>
-                    {watchedType !== 'INCOME' && creditCards.length > 0 && (
-                      <SelectGroup>
-                        <SelectLabel>Cartões de Crédito</SelectLabel>
-                        {creditCards.map((creditCard) => (
-                          <SelectItem
-                            key={creditCard.id}
-                            value={`${CREDIT_CARD_ACCOUNT_PREFIX}${creditCard.id}`}
-                          >
-                            <span className="flex items-center gap-2">
-                              <CreditCardIcon size={16} className="shrink-0" />
-                              {creditCard.name}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )
-          }}
-        />
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
+          />
+        )}
 
         <FormField
           control={form.control}
