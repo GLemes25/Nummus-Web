@@ -100,7 +100,7 @@ const AdjustBalanceModal = ({ isOpen, onClose, wallet, onAdjusted }: AdjustBalan
       walletId: wallet.id,
       amount: Math.abs(balanceDifference),
       type: balanceDifference > 0 ? 'INCOME' : 'EXPENSE',
-      paymentMethod: 'BANK_TRANSFER',
+      paymentMethod: 'TRANSFER',
       description: 'Ajuste de Saldo',
       date: new Date().toISOString(),
     })

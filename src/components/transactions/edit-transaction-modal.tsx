@@ -7,8 +7,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import TransactionForm, {
-  CREDIT_CARD_ACCOUNT_PREFIX,
-  WALLET_ACCOUNT_PREFIX,
   type TransactionFormValues,
 } from '@/components/transactions/transaction-form'
 import type { TransactionMutationResult, UpdateTransactionInput } from '@/hooks/use-transactions'
@@ -50,11 +48,8 @@ const EditTransactionModal = ({
               categoryId: transaction.categoryId ?? undefined,
               description: transaction.description,
               paymentMethod: transaction.paymentMethod as TransactionFormValues['paymentMethod'],
-              accountId: transaction.creditCardId
-                ? `${CREDIT_CARD_ACCOUNT_PREFIX}${transaction.creditCardId}`
-                : transaction.walletId
-                  ? `${WALLET_ACCOUNT_PREFIX}${transaction.walletId}`
-                  : '',
+              walletId: transaction.walletId ?? undefined,
+              creditCardId: transaction.creditCardId ?? undefined,
               date: new Date(transaction.date),
             }}
             isSubmitting={isUpdating}

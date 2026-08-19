@@ -8,6 +8,7 @@ type FetchParams = {
   page?: number
   limit?: number
   walletId?: string
+  creditCardId?: string
   type?: TransactionType
   enabled?: boolean
 }
@@ -43,6 +44,7 @@ export const useTransactions = (params: FetchParams = {}) => {
     if (params.page) query.set("page", String(params.page))
     if (params.limit) query.set("limit", String(params.limit))
     if (params.walletId) query.set("walletId", params.walletId)
+    if (params.creditCardId) query.set("creditCardId", params.creditCardId)
     if (params.type) query.set("type", params.type)
 
     return Promise.resolve()
@@ -68,7 +70,7 @@ export const useTransactions = (params: FetchParams = {}) => {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [isEnabled, params.page, params.limit, params.walletId, params.type])
+  }, [isEnabled, params.page, params.limit, params.walletId, params.creditCardId, params.type])
 
   const deleteTransaction = useCallback(
     async (id: string): Promise<boolean> => {
