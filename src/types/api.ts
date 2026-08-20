@@ -48,6 +48,7 @@ export type Transaction = {
   walletId: string | null
   creditCardId: string | null
   categoryId: string | null
+  installmentId?: string
   userId: string
   createdAt: string
   updatedAt: string

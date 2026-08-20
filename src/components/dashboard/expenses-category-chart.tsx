@@ -46,14 +46,22 @@ const GHOST_ENTRY: ChartEntry = {
   icon: "minus",
 };
 
-const ExpensesCategoryChart = () => {
-  const { data, isLoading } = useExpensesByCategory();
+type ExpensesCategoryChartProps = {
+  startDate?: Date
+  endDate?: Date
+};
 
-  const currentMonthLabel = new Date().toLocaleDateString("pt-BR", {
+const ExpensesCategoryChart = ({ startDate, endDate }: ExpensesCategoryChartProps) => {
+  const { data, isLoading } = useExpensesByCategory({
+    startDate: startDate?.toISOString(),
+    endDate: endDate?.toISOString(),
+  });
+
+  const referenceMonthLabel = (startDate ?? new Date()).toLocaleDateString("pt-BR", {
     month: "long",
   });
-  const currentMonthLabelCapitalized =
-    currentMonthLabel.charAt(0).toUpperCase() + currentMonthLabel.slice(1);
+  const referenceMonthLabelCapitalized =
+    referenceMonthLabel.charAt(0).toUpperCase() + referenceMonthLabel.slice(1);
 
   const validData = Array.isArray(data)
     ? data.filter((item) => Number(item.amount) > 0)
@@ -68,7 +76,7 @@ const ExpensesCategoryChart = () => {
       <div className="mb-3.5">
         <h3 className="text-foreground m-0 mb-1 font-semibold">Gastos</h3>
         <p className="text-muted-foreground text-sm m-0">
-          Por categoria · {currentMonthLabelCapitalized}
+          Por categoria · {referenceMonthLabelCapitalized}
         </p>
       </div>
 
