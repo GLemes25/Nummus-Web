@@ -76,6 +76,12 @@ const transactionFormSchema = z
     walletId: z.string().optional(),
     creditCardId: z.string().optional(),
     date: z.date({ error: 'Selecione uma data válida' }),
+    installments: z
+      .number()
+      .int()
+      .min(1, 'Mínimo de 1 parcela')
+      .max(72, 'Máximo de 72 parcelas')
+      .optional(),
   })
   .refine((data) => data.type !== 'INCOME' || data.paymentMethod !== 'CREDIT', {
     message: 'Não é possível lançar receita em cartão de crédito',
@@ -127,6 +133,7 @@ const TransactionForm = ({
       walletId: wallets[0]?.id ?? '',
       creditCardId: undefined,
       date: new Date(),
+      installments: 1,
       ...defaultValues,
     },
   })
@@ -149,6 +156,14 @@ const TransactionForm = ({
     return evaluateMathExpression(rawAmount)
   }, [rawAmount])
 
+  const watchedInstallments = useWatch({ control: form.control, name: 'installments' })
+  const installmentPreview = useMemo(() => {
+    if (watchedType !== 'EXPENSE' || !watchedInstallments || watchedInstallments <= 1) return null
+    const evaluated = evaluateMathExpression(rawAmount)
+    if (evaluated === null || evaluated <= 0) return null
+    return { count: watchedInstallments, value: evaluated / watchedInstallments }
+  }, [watchedType, watchedInstallments, rawAmount])
+
   const handleSubmit = async (values: TransactionFormValues) => {
     setSubmitError(null)
     const amount = evaluateMathExpression(values.amount)
@@ -162,6 +177,7 @@ const TransactionForm = ({
       amount,
       walletId: isCreditCardAccount ? undefined : values.walletId,
       creditCardId: isCreditCardAccount ? values.creditCardId : undefined,
+      installments: values.type === 'EXPENSE' ? values.installments : undefined,
     })
     if (!result.success) {
       setSubmitError(result.error ?? 'Ocorreu um erro inesperado. Tente novamente.')
@@ -243,6 +259,39 @@ const TransactionForm = ({
             </FormItem>
           )}
         />
+
+        {watchedType === 'EXPENSE' && (
+          <FormField
+            control={form.control}
+            name="installments"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                  PARCELAS
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="72"
+                    value={field.value ?? 1}
+                    onBlur={field.onBlur}
+                    onChange={(event) => {
+                      const parsed = Number(event.target.value)
+                      field.onChange(Number.isNaN(parsed) ? undefined : parsed)
+                    }}
+                  />
+                </FormControl>
+                {installmentPreview && (
+                  <p className="text-muted-foreground text-xs">
+                    {installmentPreview.count} parcelas de R$ {formatCurrency(installmentPreview.value)}
+                  </p>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

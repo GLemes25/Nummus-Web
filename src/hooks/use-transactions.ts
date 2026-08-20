@@ -22,6 +22,7 @@ export type CreateTransactionInput = {
   creditCardId?: string
   categoryId?: string
   date: string
+  installments?: number
 }
 
 export type UpdateTransactionInput = CreateTransactionInput
