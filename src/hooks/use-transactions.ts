@@ -11,6 +11,8 @@ type FetchParams = {
   creditCardId?: string
   type?: TransactionType
   enabled?: boolean
+  startDate?: string
+  endDate?: string
 }
 
 export type CreateTransactionInput = {
@@ -47,6 +49,8 @@ export const useTransactions = (params: FetchParams = {}) => {
     if (params.walletId) query.set("walletId", params.walletId)
     if (params.creditCardId) query.set("creditCardId", params.creditCardId)
     if (params.type) query.set("type", params.type)
+    if (params.startDate) query.set("startDate", params.startDate)
+    if (params.endDate) query.set("endDate", params.endDate)
 
     return Promise.resolve()
       .then(() => {
@@ -71,7 +75,16 @@ export const useTransactions = (params: FetchParams = {}) => {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [isEnabled, params.page, params.limit, params.walletId, params.creditCardId, params.type])
+  }, [
+    isEnabled,
+    params.page,
+    params.limit,
+    params.walletId,
+    params.creditCardId,
+    params.type,
+    params.startDate,
+    params.endDate,
+  ])
 
   const deleteTransaction = useCallback(
     async (id: string): Promise<boolean> => {

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/chart";
 import { useTransactions } from "@/hooks/use-transactions";
 import type { Transaction } from "@/types/api";
-import { eachDayOfInterval, format, startOfMonth } from "date-fns";
+import { eachDayOfInterval, format } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 
@@ -34,10 +34,14 @@ const getColorForValue = (value: number, max: number, colors: string[]) => {
   return colors[index];
 };
 
-const buildCashFlowSeries = (transactions: Transaction[]): DailyCashFlow[] => {
+const buildCashFlowSeries = (
+  transactions: Transaction[],
+  monthStart: Date,
+  monthEnd: Date,
+): DailyCashFlow[] => {
   const now = new Date();
-  const monthStart = startOfMonth(now);
-  const days = eachDayOfInterval({ start: monthStart, end: now });
+  const rangeEnd = monthEnd < now ? monthEnd : now;
+  const days = eachDayOfInterval({ start: monthStart, end: rangeEnd });
 
   const dailyTotals = new Map<string, { income: number; expense: number }>();
   days.forEach((day) =>
@@ -47,7 +51,7 @@ const buildCashFlowSeries = (transactions: Transaction[]): DailyCashFlow[] => {
   transactions.forEach((transaction) => {
     if (transaction.type !== "INCOME" && transaction.type !== "EXPENSE") return;
     const transactionDate = new Date(transaction.date);
-    if (transactionDate < monthStart || transactionDate > now) return;
+    if (transactionDate < monthStart || transactionDate > rangeEnd) return;
 
     const key = format(transactionDate, "yyyy-MM-dd");
     const bucket = dailyTotals.get(key);
@@ -75,10 +79,19 @@ const formatCompactCurrency = (value: number) => {
   return `R$ ${value.toFixed(0)}`;
 };
 
-const CashFlowChart = () => {
-  const { transactions, isLoading } = useTransactions({ limit: 100 });
+type CashFlowChartProps = {
+  startDate: Date;
+  endDate: Date;
+};
 
-  const data = buildCashFlowSeries(transactions);
+const CashFlowChart = ({ startDate, endDate }: CashFlowChartProps) => {
+  const { transactions, isLoading } = useTransactions({
+    limit: 100,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  });
+
+  const data = buildCashFlowSeries(transactions, startDate, endDate);
   const hasMovement = data.some((day) => day.income > 0 || day.expense > 0);
   const maxIncome = Math.max(...data.map((day) => day.income), 1);
   const maxExpense = Math.max(...data.map((day) => day.expense), 1);
@@ -90,7 +103,7 @@ const CashFlowChart = () => {
           Fluxo de Caixa
         </h3>
         <p className="text-muted-foreground text-sm m-0">
-          Receitas x despesas no mês atual
+          Receitas x despesas no mês selecionado
         </p>
       </div>
 

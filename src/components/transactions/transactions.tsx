@@ -6,6 +6,7 @@ import { Search, Trash2, Edit3, MoreHorizontal, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
+import MonthSelector from '@/components/ui/month-selector'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import EditTransactionModal from '@/components/transactions/edit-transaction-modal'
+import { useDateFilter } from '@/hooks/use-date-filter'
 import { useTransactions } from '@/hooks/use-transactions'
 import type { Transaction } from '@/types/api'
 
@@ -74,8 +76,10 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const { startDate, endDate, label, goToPreviousMonth, goToNextMonth } = useDateFilter()
+
   const { transactions, meta, isLoading, deleteTransaction, updateTransaction, isUpdating } =
-    useTransactions({ limit: 50 })
+    useTransactions({ limit: 50, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
 
   const filtered = transactions.filter((tx) => {
     const matchType = filter === 'all' || tx.type === filter
@@ -106,6 +110,10 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
         <Button onClick={onNewTransaction} className="bg-brand text-brand-foreground hover:bg-brand/90">
           + Novo
         </Button>
+      </div>
+
+      <div className="mb-5">
+        <MonthSelector label={label} onPrevious={goToPreviousMonth} onNext={goToNextMonth} />
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">

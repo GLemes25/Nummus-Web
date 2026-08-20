@@ -7,7 +7,9 @@ import SummaryCards from "@/components/dashboard/summary-cards";
 import TransactionTypeDetailsModal from "@/components/transactions/transaction-type-details-modal";
 import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
+import MonthSelector from "@/components/ui/month-selector";
 import WalletDetailsModal from "@/components/wallets/wallet-details-modal";
+import { useDateFilter } from "@/hooks/use-date-filter";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useWallets } from "@/hooks/use-wallets";
 import { useSession } from "@/lib/auth-client";
@@ -39,8 +41,12 @@ const formatCurrency = (value: number) =>
 const Dashboard = ({ onNavigate }: DashboardProps) => {
   const { data: sessionData } = useSession();
   const { wallets, isLoading: isWalletsLoading } = useWallets();
+  const { startDate, endDate, label, goToPreviousMonth, goToNextMonth } =
+    useDateFilter();
   const { transactions, isLoading: isTransactionsLoading } = useTransactions({
     limit: 5,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
   });
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
   const [selectedTxType, setSelectedTxType] = useState<IncomeOrExpense | null>(
@@ -104,6 +110,14 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             {userInitials}
           </div>
         </div>
+      </div>
+
+      <div className="mb-5">
+        <MonthSelector
+          label={label}
+          onPrevious={goToPreviousMonth}
+          onNext={goToNextMonth}
+        />
       </div>
 
       <motion.div
@@ -177,11 +191,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         onSelectType={setSelectedTxType}
       />
 
-      <CashFlowChart />
+      <CashFlowChart startDate={startDate} endDate={endDate} />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 mb-5">
         <BalanceTrendChart />
-        <ExpensesCategoryChart />
+        <ExpensesCategoryChart startDate={startDate} endDate={endDate} />
       </div>
 
       <div className="bg-card border border-border rounded-xl p-6">
