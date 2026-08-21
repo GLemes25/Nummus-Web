@@ -18,6 +18,22 @@
 - **SEMPRE** utilize as variáveis de cor do tema definidas no seu `@app/globals.css` (exemplos: `text-background`, `bg-foreground`, `bg-primary`, `text-primary-foreground`, `border-border`).
 - **Novas Variáveis:** Caso a cor necessária não exista, crie uma nova variável CSS em `@app/globals.css` seguindo o padrão já existente. Porém, antes de criar, **SEMPRE** leia a documentação do shadcn/ui sobre _theming_ para confirmar se é realmente necessário.
 
+## Rule: Select Component Display
+
+Quando implementar componentes `Select` (shadcn/ui + react-hook-form), sempre garanta que a interface exiba o **Label** (texto legível) e **nunca** o **Value** (UUID/ID).
+
+- Use `<SelectValue placeholder="..."/>` deixando o Radix/Base UI inferir o texto a partir do `<SelectItem>` correspondente.
+- **Atenção (Base UI):** este projeto usa `@base-ui/react/select`, não Radix. No Base UI, `Select.Value` só resolve o label automaticamente se os `SelectItem` já estiverem montados no DOM — como `SelectContent` é renderizado dentro de um `Portal`, isso nem sempre acontece no carregamento inicial (ex: preencher um formulário de edição com um valor já selecionado), causando a exibição do ID bruto.
+- Se houver bugs de renderização de ID na tela, **sempre** faça o fallback usando a render-prop de `SelectValue` (`children` como função), buscando o nome na lista de opções correspondente ao valor selecionado:
+
+```tsx
+<SelectValue placeholder="Selecione">
+  {(value: string) =>
+    options.find((option) => option.id === value)?.name ?? "Selecione"
+  }
+</SelectValue>
+```
+
 ## Formulários e Validação
 
 - **Stack Obrigatória:** **SEMPRE** construa formulários utilizando `React Hook Form` em conjunto com `Zod` para validação de esquemas.
