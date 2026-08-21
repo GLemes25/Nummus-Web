@@ -51,6 +51,7 @@ const EditTransactionModal = ({
               walletId: transaction.walletId ?? undefined,
               creditCardId: transaction.creditCardId ?? undefined,
               date: new Date(transaction.date),
+              status: transaction.status === 'COMPLETED' ? 'COMPLETED' : 'PENDING',
             }}
             isSubmitting={isUpdating}
             submitLabel="Salvar Alterações"

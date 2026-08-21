@@ -103,6 +103,7 @@ const AdjustBalanceModal = ({ isOpen, onClose, wallet, onAdjusted }: AdjustBalan
       paymentMethod: 'TRANSFER',
       description: 'Ajuste de Saldo',
       date: new Date().toISOString(),
+      status: 'COMPLETED',
     })
 
     if (!result.success) {
