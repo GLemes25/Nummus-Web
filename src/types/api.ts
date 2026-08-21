@@ -94,3 +94,9 @@ export type ExpenseByCategory = {
   color: string
   icon: string
 }
+
+export type MonthlySummary = {
+  totalIncome: number
+  totalExpense: number
+  balance: number
+}

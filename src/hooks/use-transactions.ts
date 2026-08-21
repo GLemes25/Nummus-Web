@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { apiClient } from "@/lib/api-client"
-import type { PaymentMethod, Transaction, TransactionsMeta, TransactionType } from "@/types/api"
+import type {
+  PaymentMethod,
+  Transaction,
+  TransactionsMeta,
+  TransactionStatus,
+  TransactionType,
+} from "@/types/api"
 
 type FetchParams = {
   page?: number
@@ -19,6 +25,7 @@ export type CreateTransactionInput = {
   amount: number
   type: "INCOME" | "EXPENSE"
   paymentMethod: PaymentMethod
+  status: TransactionStatus
   description: string
   walletId?: string
   creditCardId?: string
@@ -39,6 +46,7 @@ export const useTransactions = (params: FetchParams = {}) => {
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [isRealizing, setIsRealizing] = useState(false)
 
   const fetchTransactions = useCallback(() => {
     if (!isEnabled) return Promise.resolve()
@@ -121,6 +129,26 @@ export const useTransactions = (params: FetchParams = {}) => {
     [fetchTransactions]
   )
 
+  const realizeTransaction = useCallback(
+    async (id: string): Promise<TransactionMutationResult> => {
+      setIsRealizing(true)
+      try {
+        const res = await apiClient.patch(`/transactions/${id}/realize`, {})
+        if (!res || !res.ok) {
+          const data = res ? await res.json().catch(() => null) : null
+          return { success: false, error: data?.error ?? "Erro ao dar baixa na transação" }
+        }
+        await fetchTransactions()
+        return { success: true }
+      } catch {
+        return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
+      } finally {
+        setIsRealizing(false)
+      }
+    },
+    [fetchTransactions]
+  )
+
   const createTransaction = useCallback(
     async (input: CreateTransactionInput): Promise<TransactionMutationResult> => {
       setIsCreating(true)
@@ -156,5 +184,7 @@ export const useTransactions = (params: FetchParams = {}) => {
     isUpdating,
     createTransaction,
     isCreating,
+    realizeTransaction,
+    isRealizing,
   }
 }

@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { useCategories } from '@/hooks/use-categories'
 import { useCreditCards } from '@/hooks/use-credit-cards'
 import { useWallets } from '@/hooks/use-wallets'
@@ -76,6 +77,7 @@ const transactionFormSchema = z
     walletId: z.string().optional(),
     creditCardId: z.string().optional(),
     date: z.date({ error: 'Selecione uma data válida' }),
+    status: z.enum(['PENDING', 'COMPLETED']),
     installments: z
       .number()
       .int()
@@ -133,6 +135,7 @@ const TransactionForm = ({
       walletId: wallets[0]?.id ?? '',
       creditCardId: undefined,
       date: new Date(),
+      status: 'COMPLETED',
       installments: 1,
       ...defaultValues,
     },
@@ -521,6 +524,32 @@ const TransactionForm = ({
                   />
                 </PopoverContent>
               </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between">
+              <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                STATUS
+              </FormLabel>
+              <div className="flex items-center gap-2.5">
+                <span className="text-foreground text-sm">
+                  {field.value === 'COMPLETED' ? 'Pago' : 'Pendente'}
+                </span>
+                <FormControl>
+                  <Switch
+                    checked={field.value === 'COMPLETED'}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked ? 'COMPLETED' : 'PENDING')
+                    }
+                  />
+                </FormControl>
+              </div>
               <FormMessage />
             </FormItem>
           )}

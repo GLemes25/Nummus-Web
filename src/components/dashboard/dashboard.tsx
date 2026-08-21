@@ -10,6 +10,7 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import MonthSelector from "@/components/ui/month-selector";
 import WalletDetailsModal from "@/components/wallets/wallet-details-modal";
 import { useDateFilter } from "@/hooks/use-date-filter";
+import { useMonthlySummary } from "@/hooks/use-monthly-summary";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useWallets } from "@/hooks/use-wallets";
 import { useSession } from "@/lib/auth-client";
@@ -48,6 +49,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
   });
+  const { summary, isLoading: isSummaryLoading } = useMonthlySummary({
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  });
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
   const [selectedTxType, setSelectedTxType] = useState<IncomeOrExpense | null>(
     null,
@@ -65,16 +70,6 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
 
   const activeWallets = wallets.filter((w) => !w.isArchived);
   const netWorth = activeWallets.reduce((sum, w) => sum + w.balance, 0);
-
-  const monthlyIncome = transactions
-    .filter((t) => t.type === "INCOME")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const monthlyExpenses = transactions
-    .filter((t) => t.type === "EXPENSE")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const savings = monthlyIncome - monthlyExpenses;
 
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -184,10 +179,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
       )}
 
       <SummaryCards
-        monthlyIncome={monthlyIncome}
-        monthlyExpenses={monthlyExpenses}
-        savings={savings}
-        isLoading={isTransactionsLoading}
+        monthlyIncome={summary.totalIncome}
+        monthlyExpenses={summary.totalExpense}
+        savings={summary.balance}
+        isLoading={isSummaryLoading}
         onSelectType={setSelectedTxType}
       />
 

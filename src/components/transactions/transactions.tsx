@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, Trash2, Edit3, MoreHorizontal, Loader2 } from 'lucide-react'
+import { Search, Trash2, Edit3, MoreHorizontal, Loader2, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
@@ -75,11 +75,29 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [realizingId, setRealizingId] = useState<string | null>(null)
 
   const { startDate, endDate, label, goToPreviousMonth, goToNextMonth } = useDateFilter()
 
-  const { transactions, meta, isLoading, deleteTransaction, updateTransaction, isUpdating } =
-    useTransactions({ limit: 50, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
+  const {
+    transactions,
+    meta,
+    isLoading,
+    deleteTransaction,
+    updateTransaction,
+    isUpdating,
+    realizeTransaction,
+    isRealizing,
+  } = useTransactions({ limit: 50, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
+
+  const handleRealizeTransaction = async (id: string) => {
+    setRealizingId(id)
+    const result = await realizeTransaction(id)
+    if (!result.success) {
+      console.error(result.error)
+    }
+    setRealizingId(null)
+  }
 
   const filtered = transactions.filter((tx) => {
     const matchType = filter === 'all' || tx.type === filter
@@ -186,10 +204,16 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                   {grouped[dateLabel].map((tx, i) => (
                     <div
                       key={tx.id}
-                      className="flex items-center px-4 py-3.5 hover:bg-foreground/2 transition-colors"
+                      className={`flex items-center px-4 py-3.5 hover:bg-foreground/2 transition-colors ${
+                        tx.status === 'PENDING'
+                          ? 'opacity-60 border border-dashed border-border'
+                          : ''
+                      }`}
                       style={{
                         borderBottom:
-                          i < grouped[dateLabel].length - 1 ? '1px solid #1f1f22' : 'none',
+                          i < grouped[dateLabel].length - 1 && tx.status !== 'PENDING'
+                            ? '1px solid var(--border)'
+                            : undefined,
                       }}
                     >
                       <div
@@ -225,6 +249,22 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                         </div>
                         <div className="text-zinc-700 text-xs mt-0.5">{typeLabels[tx.type]}</div>
                       </div>
+                      {tx.status === 'PENDING' && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isRealizing && realizingId === tx.id}
+                          onClick={() => handleRealizeTransaction(tx.id)}
+                          className="ml-2 shrink-0 w-8 h-8 text-income hover:text-income hover:bg-income/10"
+                          title="Dar baixa"
+                        >
+                          {isRealizing && realizingId === tx.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <CheckCircle size={16} />
+                          )}
+                        </Button>
+                      )}
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           render={
