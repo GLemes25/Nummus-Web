@@ -16,12 +16,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useWallets } from "@/hooks/use-wallets";
 import type { CreditCard } from "@/types/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+const NO_WALLET_VALUE = "none";
 
 const editCreditCardSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -38,6 +48,7 @@ const editCreditCardSchema = z.object({
     .int("O dia deve ser um número inteiro")
     .min(1, "O dia deve estar entre 1 e 31")
     .max(31, "O dia deve estar entre 1 e 31"),
+  walletId: z.string().default(NO_WALLET_VALUE),
 });
 
 type EditCreditCardFormInput = z.input<typeof editCreditCardSchema>;
@@ -49,7 +60,13 @@ type EditCreditCardModalProps = {
   creditCard: CreditCard | null;
   onUpdateCreditCard: (
     id: string,
-    input: EditCreditCardValues
+    input: {
+      name: string;
+      creditLimit: number;
+      closingDay: number;
+      dueDay: number;
+      walletId?: string;
+    }
   ) => Promise<boolean>;
   isUpdating: boolean;
 };
@@ -62,6 +79,7 @@ const EditCreditCardModal = ({
   isUpdating,
 }: EditCreditCardModalProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { wallets, isLoading: isLoadingWallets } = useWallets();
 
   const form = useForm<
     EditCreditCardFormInput,
@@ -69,7 +87,13 @@ const EditCreditCardModal = ({
     EditCreditCardValues
   >({
     resolver: zodResolver(editCreditCardSchema),
-    defaultValues: { name: "", creditLimit: 0, closingDay: 1, dueDay: 10 },
+    defaultValues: {
+      name: "",
+      creditLimit: 0,
+      closingDay: 1,
+      dueDay: 10,
+      walletId: NO_WALLET_VALUE,
+    },
   });
 
   useEffect(() => {
@@ -79,6 +103,7 @@ const EditCreditCardModal = ({
       creditLimit: creditCard.creditLimit,
       closingDay: creditCard.closingDay,
       dueDay: creditCard.dueDay,
+      walletId: creditCard.walletId ?? NO_WALLET_VALUE,
     });
   }, [creditCard, form]);
 
@@ -91,7 +116,11 @@ const EditCreditCardModal = ({
   const onSubmit = async (values: EditCreditCardValues) => {
     if (!creditCard) return;
     setSubmitError(null);
-    const isSuccess = await onUpdateCreditCard(creditCard.id, values);
+    const isSuccess = await onUpdateCreditCard(creditCard.id, {
+      ...values,
+      walletId:
+        values.walletId === NO_WALLET_VALUE ? undefined : values.walletId,
+    });
     if (!isSuccess) {
       setSubmitError("Erro ao atualizar cartão. Tente novamente.");
       return;
@@ -205,6 +234,38 @@ const EditCreditCardModal = ({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="walletId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    CONTA BANCÁRIA VINCULADA (OPCIONAL)
+                  </FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isLoadingWallets}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Nenhuma" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_WALLET_VALUE}>Nenhuma</SelectItem>
+                      {wallets.map((wallet) => (
+                        <SelectItem key={wallet.id} value={wallet.id}>
+                          {wallet.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {submitError && (
               <p className="text-expense text-sm text-center">

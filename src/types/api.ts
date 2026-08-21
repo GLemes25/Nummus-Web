@@ -17,6 +17,7 @@ export type CreditCard = {
   closingDay: number
   dueDay: number
   currentInvoiceAmount: number
+  walletId?: string | null
   userId: string
   createdAt: string
   updatedAt: string

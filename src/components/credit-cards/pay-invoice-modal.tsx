@@ -25,7 +25,7 @@ import {
 import type { CreditCard, Wallet } from "@/types/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -63,6 +63,11 @@ const PayInvoiceModal = ({
     resolver: zodResolver(payInvoiceSchema),
     defaultValues: { walletId: "" },
   });
+
+  useEffect(() => {
+    if (!creditCard) return;
+    form.reset({ walletId: creditCard.walletId ?? "" });
+  }, [creditCard, form]);
 
   const handleClose = () => {
     form.reset();
