@@ -9,6 +9,7 @@ type CreateCreditCardInput = {
   creditLimit: number
   closingDay: number
   dueDay: number
+  walletId?: string
 }
 
 type UpdateCreditCardInput = {
@@ -16,6 +17,7 @@ type UpdateCreditCardInput = {
   creditLimit: number
   closingDay: number
   dueDay: number
+  walletId?: string
 }
 
 export const useCreditCards = () => {

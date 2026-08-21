@@ -16,11 +16,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useWallets } from "@/hooks/use-wallets";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+const NO_WALLET_VALUE = "none";
 
 const createCreditCardSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -37,6 +47,7 @@ const createCreditCardSchema = z.object({
     .int("O dia deve ser um número inteiro")
     .min(1, "O dia deve estar entre 1 e 31")
     .max(31, "O dia deve estar entre 1 e 31"),
+  walletId: z.string().default(NO_WALLET_VALUE),
 });
 
 type CreateCreditCardFormInput = z.input<typeof createCreditCardSchema>;
@@ -45,7 +56,13 @@ type CreateCreditCardValues = z.output<typeof createCreditCardSchema>;
 type CreateCreditCardModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreateCreditCard: (input: CreateCreditCardValues) => Promise<boolean>;
+  onCreateCreditCard: (input: {
+    name: string;
+    creditLimit: number;
+    closingDay: number;
+    dueDay: number;
+    walletId?: string;
+  }) => Promise<boolean>;
   isCreating: boolean;
 };
 
@@ -56,6 +73,7 @@ const CreateCreditCardModal = ({
   isCreating,
 }: CreateCreditCardModalProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { wallets, isLoading: isLoadingWallets } = useWallets();
 
   const form = useForm<
     CreateCreditCardFormInput,
@@ -63,7 +81,13 @@ const CreateCreditCardModal = ({
     CreateCreditCardValues
   >({
     resolver: zodResolver(createCreditCardSchema),
-    defaultValues: { name: "", creditLimit: 0, closingDay: 1, dueDay: 10 },
+    defaultValues: {
+      name: "",
+      creditLimit: 0,
+      closingDay: 1,
+      dueDay: 10,
+      walletId: NO_WALLET_VALUE,
+    },
   });
 
   const handleClose = () => {
@@ -74,7 +98,11 @@ const CreateCreditCardModal = ({
 
   const onSubmit = async (values: CreateCreditCardValues) => {
     setSubmitError(null);
-    const isSuccess = await onCreateCreditCard(values);
+    const isSuccess = await onCreateCreditCard({
+      ...values,
+      walletId:
+        values.walletId === NO_WALLET_VALUE ? undefined : values.walletId,
+    });
     if (!isSuccess) {
       setSubmitError("Erro ao criar cartão. Tente novamente.");
       return;
@@ -188,6 +216,38 @@ const CreateCreditCardModal = ({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="walletId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    CONTA BANCÁRIA VINCULADA (OPCIONAL)
+                  </FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isLoadingWallets}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Nenhuma" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_WALLET_VALUE}>Nenhuma</SelectItem>
+                      {wallets.map((wallet) => (
+                        <SelectItem key={wallet.id} value={wallet.id}>
+                          {wallet.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {submitError && (
               <p className="text-expense text-sm text-center">
