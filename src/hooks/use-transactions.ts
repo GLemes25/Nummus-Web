@@ -13,6 +13,8 @@ import type {
 type FetchParams = {
   page?: number
   limit?: number
+  search?: string
+  categoryId?: string
   walletId?: string
   creditCardId?: string
   type?: TransactionType
@@ -54,6 +56,8 @@ export const useTransactions = (params: FetchParams = {}) => {
     const query = new URLSearchParams()
     if (params.page) query.set("page", String(params.page))
     if (params.limit) query.set("limit", String(params.limit))
+    if (params.search) query.set("search", params.search)
+    if (params.categoryId) query.set("categoryId", params.categoryId)
     if (params.walletId) query.set("walletId", params.walletId)
     if (params.creditCardId) query.set("creditCardId", params.creditCardId)
     if (params.type) query.set("type", params.type)
@@ -87,6 +91,8 @@ export const useTransactions = (params: FetchParams = {}) => {
     isEnabled,
     params.page,
     params.limit,
+    params.search,
+    params.categoryId,
     params.walletId,
     params.creditCardId,
     params.type,

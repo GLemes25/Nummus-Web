@@ -2,9 +2,8 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, Trash2, Edit3, MoreHorizontal, Loader2, CheckCircle } from 'lucide-react'
+import { Trash2, Edit3, MoreHorizontal, Loader2, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import MonthSelector from '@/components/ui/month-selector'
 import {
@@ -24,16 +23,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import EditTransactionModal from '@/components/transactions/edit-transaction-modal'
+import TransactionFilters from '@/components/transactions/transaction-filters'
 import { useDateFilter } from '@/hooks/use-date-filter'
+import { useDebounce } from '@/hooks/use-debounce'
 import { useTransactions } from '@/hooks/use-transactions'
-import type { Transaction } from '@/types/api'
+import type { Transaction, TransactionType } from '@/types/api'
 
-const filterLabels: Record<string, string> = {
-  all: 'Todos',
-  INCOME: 'Receita',
-  EXPENSE: 'Despesa',
-  BALANCE_ADJUSTMENT: 'Ajuste',
-}
+const ALL_VALUE = 'all'
 
 const typeLabels: Record<string, string> = {
   INCOME: 'receita',
@@ -70,14 +66,34 @@ type TransactionsProps = {
 }
 
 const Transactions = ({ onNewTransaction }: TransactionsProps) => {
-  const [filter, setFilter] = useState<'all' | 'INCOME' | 'EXPENSE' | 'BALANCE_ADJUSTMENT'>('all')
   const [search, setSearch] = useState('')
+  const [type, setType] = useState<TransactionType | typeof ALL_VALUE>(ALL_VALUE)
+  const [categoryId, setCategoryId] = useState(ALL_VALUE)
+  const [walletId, setWalletId] = useState(ALL_VALUE)
+  const [creditCardId, setCreditCardId] = useState(ALL_VALUE)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [realizingId, setRealizingId] = useState<string | null>(null)
 
+  const debouncedSearch = useDebounce(search, 400)
+
   const { startDate, endDate, label, goToPreviousMonth, goToNextMonth } = useDateFilter()
+
+  const hasActiveFilters =
+    type !== ALL_VALUE || categoryId !== ALL_VALUE || walletId !== ALL_VALUE || creditCardId !== ALL_VALUE
+
+  const handleClearFilters = () => {
+    setType(ALL_VALUE)
+    setCategoryId(ALL_VALUE)
+    setWalletId(ALL_VALUE)
+    setCreditCardId(ALL_VALUE)
+  }
+
+  const handleAccountChange = (nextWalletId: string, nextCreditCardId: string) => {
+    setWalletId(nextWalletId)
+    setCreditCardId(nextCreditCardId)
+  }
 
   const {
     transactions,
@@ -88,7 +104,16 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
     isUpdating,
     realizeTransaction,
     isRealizing,
-  } = useTransactions({ limit: 50, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
+  } = useTransactions({
+    limit: 50,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    search: debouncedSearch || undefined,
+    type: type === ALL_VALUE ? undefined : type,
+    categoryId: categoryId === ALL_VALUE ? undefined : categoryId,
+    walletId: walletId === ALL_VALUE ? undefined : walletId,
+    creditCardId: creditCardId === ALL_VALUE ? undefined : creditCardId,
+  })
 
   const handleRealizeTransaction = async (id: string) => {
     setRealizingId(id)
@@ -99,20 +124,11 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
     setRealizingId(null)
   }
 
-  const filtered = transactions.filter((tx) => {
-    const matchType = filter === 'all' || tx.type === filter
-    const matchSearch =
-      !search ||
-      tx.description.toLowerCase().includes(search.toLowerCase()) ||
-      (tx.category?.name.toLowerCase().includes(search.toLowerCase()) ?? false)
-    return matchType && matchSearch
-  })
-
-  const grouped = groupByDate(filtered)
+  const grouped = groupByDate(transactions)
   const dateKeys = Object.keys(grouped)
 
-  const totalIncome = filtered.filter((t) => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0)
-  const totalExpense = filtered
+  const totalIncome = transactions.filter((t) => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0)
+  const totalExpense = transactions
     .filter((t) => t.type === 'EXPENSE')
     .reduce((s, t) => s + t.amount, 0)
 
@@ -145,37 +161,19 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
         </div>
       </div>
 
-      <div className="flex gap-2.5 mb-5 flex-wrap">
-        <div className="relative flex-1 min-w-50">
-          <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none"
-          />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar transações…"
-            className="pl-9 bg-card border-border text-foreground"
-          />
-        </div>
-        <div className="flex gap-1.5">
-          {(['all', 'INCOME', 'EXPENSE'] as const).map((f) => (
-            <Button
-              key={f}
-              onClick={() => setFilter(f)}
-              variant={filter === f ? 'secondary' : 'outline'}
-              size="sm"
-              className={
-                filter === f
-                  ? 'bg-brand/15 text-brand-muted border-brand/40'
-                  : 'bg-card border-border text-muted-foreground'
-              }
-            >
-              {filterLabels[f]}
-            </Button>
-          ))}
-        </div>
-      </div>
+      <TransactionFilters
+        search={search}
+        onSearchChange={setSearch}
+        type={type}
+        onTypeChange={setType}
+        categoryId={categoryId}
+        onCategoryChange={setCategoryId}
+        walletId={walletId}
+        creditCardId={creditCardId}
+        onAccountChange={handleAccountChange}
+        onClearFilters={handleClearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-16">
