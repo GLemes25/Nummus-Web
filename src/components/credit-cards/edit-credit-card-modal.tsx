@@ -148,6 +148,45 @@ const EditCreditCardModal = ({
           >
             <FormField
               control={form.control}
+              name="walletId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    VINCULAR CONTA
+                  </FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isLoadingWallets}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Vincular conta">
+                          {(value: string) =>
+                            value && value !== NO_WALLET_VALUE
+                              ? (wallets.find((wallet) => wallet.id === value)
+                                  ?.name ?? "Vincular conta")
+                              : "Nenhuma"
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_WALLET_VALUE}>Nenhuma</SelectItem>
+                      {wallets.map((wallet) => (
+                        <SelectItem key={wallet.id} value={wallet.id}>
+                          {wallet.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -234,38 +273,6 @@ const EditCreditCardModal = ({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="walletId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
-                    CONTA BANCÁRIA VINCULADA (OPCIONAL)
-                  </FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isLoadingWallets}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Nenhuma" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={NO_WALLET_VALUE}>Nenhuma</SelectItem>
-                      {wallets.map((wallet) => (
-                        <SelectItem key={wallet.id} value={wallet.id}>
-                          {wallet.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {submitError && (
               <p className="text-expense text-sm text-center">
