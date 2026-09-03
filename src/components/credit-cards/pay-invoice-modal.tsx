@@ -130,7 +130,12 @@ const PayInvoiceModal = ({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione a carteira" />
+                        <SelectValue placeholder="Selecione a carteira">
+                          {() =>
+                            wallets.find((wallet) => wallet.id === field.value)?.name ??
+                            "Selecione a carteira"
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
