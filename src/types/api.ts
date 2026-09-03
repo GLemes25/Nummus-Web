@@ -29,6 +29,8 @@ export type Category = {
   color: string
   icon: string
   parentId: string | null
+  isSystem: boolean
+  systemId?: string | null
   userId: string
   createdAt: string
   updatedAt: string

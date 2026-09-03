@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Edit3, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, Loader2, Lock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -14,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCategories } from '@/hooks/use-categories';
 import AddCategoryModal from '@/components/categories/add-category-modal';
 import EditCategoryModal from '@/components/categories/edit-category-modal';
@@ -88,8 +90,19 @@ const Categories = () => {
                 <DynamicIcon name={category.icon} size={18} />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 flex items-center gap-2">
                 <div className="text-foreground text-sm font-medium mb-0.5">{category.name}</div>
+                {category.isSystem && (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant="secondary" className="gap-1">
+                        <Lock size={11} />
+                        Sistema
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>Categoria gerada pelo sistema</TooltipContent>
+                  </Tooltip>
+                )}
               </div>
 
               <div
@@ -97,24 +110,26 @@ const Categories = () => {
                 style={{ backgroundColor: category.color, boxShadow: `0 0 8px ${category.color}66` }}
               />
 
-              <div className="flex gap-1.5">
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="w-7.5 h-7.5 rounded-[7px] bg-muted text-muted-foreground"
-                  onClick={() => setEditingCategory(category)}
-                >
-                  <Edit3 size={13} />
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="w-7.5 h-7.5 rounded-[7px]"
-                  onClick={() => setDeletingCategory(category)}
-                >
-                  <Trash2 size={13} />
-                </Button>
-              </div>
+              {!category.isSystem && (
+                <div className="flex gap-1.5">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="w-7.5 h-7.5 rounded-[7px] bg-muted text-muted-foreground"
+                    onClick={() => setEditingCategory(category)}
+                  >
+                    <Edit3 size={13} />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="w-7.5 h-7.5 rounded-[7px]"
+                    onClick={() => setDeletingCategory(category)}
+                  >
+                    <Trash2 size={13} />
+                  </Button>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
