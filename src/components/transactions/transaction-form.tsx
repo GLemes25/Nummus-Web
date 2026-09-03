@@ -8,6 +8,7 @@ import {
   CalendarIcon,
   CreditCard as CreditCardIcon,
   Loader2,
+  Lock,
   Slash,
   Wallet as WalletIcon,
 } from 'lucide-react'
@@ -317,6 +318,9 @@ const TransactionForm = ({
                           <span className="flex items-center gap-2">
                             <DynamicIcon name={selectedCategory.icon} size={16} className="shrink-0" />
                             {selectedCategory.name}
+                            {selectedCategory.isSystem && (
+                              <Lock size={12} className="shrink-0 text-muted-foreground" />
+                            )}
                           </span>
                         ) : (
                           <span className="flex items-center gap-2">
@@ -339,6 +343,9 @@ const TransactionForm = ({
                         <span className="flex items-center gap-2">
                           <DynamicIcon name={category.icon} size={16} className="shrink-0" />
                           {category.name}
+                          {category.isSystem && (
+                            <Lock size={12} className="shrink-0 text-muted-foreground" />
+                          )}
                         </span>
                       </SelectItem>
                     ))}
