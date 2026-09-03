@@ -1,7 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
+import { emitDataChange } from "@/lib/data-events"
 import type { CreditCard } from "@/types/api"
 
 type CreateCreditCardInput = {
@@ -60,7 +62,7 @@ export const useCreditCards = () => {
       try {
         const res = await apiClient.post("/credit-cards", input)
         if (!res || !res.ok) return false
-        await fetchCreditCards()
+        emitDataChange(["credit-cards", "metrics"])
         return true
       } catch {
         return false
@@ -68,7 +70,7 @@ export const useCreditCards = () => {
         setIsCreating(false)
       }
     },
-    [fetchCreditCards]
+    []
   )
 
   const updateCreditCard = useCallback(
@@ -77,7 +79,7 @@ export const useCreditCards = () => {
       try {
         const res = await apiClient.patch(`/credit-cards/${id}`, input)
         if (!res || !res.ok) return false
-        await fetchCreditCards()
+        emitDataChange(["credit-cards", "metrics"])
         return true
       } catch {
         return false
@@ -85,7 +87,7 @@ export const useCreditCards = () => {
         setIsUpdating(false)
       }
     },
-    [fetchCreditCards]
+    []
   )
 
   const deleteCreditCard = useCallback(
@@ -94,7 +96,7 @@ export const useCreditCards = () => {
       try {
         const res = await apiClient.delete(`/credit-cards/${id}`)
         if (!res || !res.ok) return false
-        await fetchCreditCards()
+        emitDataChange(["credit-cards", "transactions", "metrics"])
         return true
       } catch {
         return false
@@ -102,7 +104,7 @@ export const useCreditCards = () => {
         setIsDeleting(false)
       }
     },
-    [fetchCreditCards]
+    []
   )
 
   const payInvoice = useCallback(
@@ -113,7 +115,7 @@ export const useCreditCards = () => {
           walletId,
         })
         if (!res || !res.ok) return false
-        await fetchCreditCards()
+        emitDataChange(["credit-cards", "wallets", "transactions", "metrics"])
         return true
       } catch {
         return false
@@ -121,12 +123,14 @@ export const useCreditCards = () => {
         setIsPayingInvoice(false)
       }
     },
-    [fetchCreditCards]
+    []
   )
 
   useEffect(() => {
     fetchCreditCards()
   }, [fetchCreditCards])
+
+  useDataRefetch(["credit-cards", "transactions"], fetchCreditCards)
 
   return {
     creditCards,

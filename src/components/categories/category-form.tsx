@@ -144,7 +144,14 @@ const CategoryForm = ({
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione uma categoria pai" />
+                    <SelectValue placeholder="Selecione uma categoria pai">
+                      {(value: string) =>
+                        value === NO_PARENT
+                          ? "Nenhuma"
+                          : (categories.find((category) => category.id === value)?.name ??
+                            "Selecione uma categoria pai")
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent sideOffset={4} className="max-h-72">

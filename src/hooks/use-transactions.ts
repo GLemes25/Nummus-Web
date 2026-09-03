@@ -1,7 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
+import { emitDataChange } from "@/lib/data-events"
 import type {
   PaymentMethod,
   Transaction,
@@ -106,13 +108,13 @@ export const useTransactions = (params: FetchParams = {}) => {
         const res = await apiClient.delete(`/transactions/${id}`)
         if (!res) return false
         if (!res.ok) return false
-        await fetchTransactions()
+        emitDataChange(["transactions", "wallets", "credit-cards", "metrics"])
         return true
       } catch {
         return false
       }
     },
-    [fetchTransactions]
+    []
   )
 
   const updateTransaction = useCallback(
@@ -124,7 +126,7 @@ export const useTransactions = (params: FetchParams = {}) => {
           const data = res ? await res.json().catch(() => null) : null
           return { success: false, error: data?.error ?? "Erro ao atualizar transação" }
         }
-        await fetchTransactions()
+        emitDataChange(["transactions", "wallets", "credit-cards", "metrics"])
         return { success: true }
       } catch {
         return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
@@ -132,7 +134,7 @@ export const useTransactions = (params: FetchParams = {}) => {
         setIsUpdating(false)
       }
     },
-    [fetchTransactions]
+    []
   )
 
   const realizeTransaction = useCallback(
@@ -144,7 +146,7 @@ export const useTransactions = (params: FetchParams = {}) => {
           const data = res ? await res.json().catch(() => null) : null
           return { success: false, error: data?.error ?? "Erro ao dar baixa na transação" }
         }
-        await fetchTransactions()
+        emitDataChange(["transactions", "wallets", "credit-cards", "metrics"])
         return { success: true }
       } catch {
         return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
@@ -152,7 +154,7 @@ export const useTransactions = (params: FetchParams = {}) => {
         setIsRealizing(false)
       }
     },
-    [fetchTransactions]
+    []
   )
 
   const createTransaction = useCallback(
@@ -164,7 +166,7 @@ export const useTransactions = (params: FetchParams = {}) => {
           const data = res ? await res.json().catch(() => null) : null
           return { success: false, error: data?.error ?? "Erro ao salvar transação" }
         }
-        await fetchTransactions()
+        emitDataChange(["transactions", "wallets", "credit-cards", "metrics"])
         return { success: true }
       } catch {
         return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." }
@@ -172,12 +174,14 @@ export const useTransactions = (params: FetchParams = {}) => {
         setIsCreating(false)
       }
     },
-    [fetchTransactions]
+    []
   )
 
   useEffect(() => {
     fetchTransactions()
   }, [fetchTransactions])
+
+  useDataRefetch(["transactions"], fetchTransactions)
 
   return {
     transactions,

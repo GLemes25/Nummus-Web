@@ -1,7 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
+import { emitDataChange } from "@/lib/data-events"
 import type { Wallet } from "@/types/api"
 
 type CreateWalletInput = {
@@ -54,7 +56,7 @@ export const useWallets = () => {
       try {
         const res = await apiClient.post("/wallets", input)
         if (!res || !res.ok) return false
-        await fetchWallets()
+        emitDataChange(["wallets", "metrics"])
         return true
       } catch {
         return false
@@ -62,7 +64,7 @@ export const useWallets = () => {
         setIsCreating(false)
       }
     },
-    [fetchWallets]
+    []
   )
 
   const updateWallet = useCallback(
@@ -71,7 +73,7 @@ export const useWallets = () => {
       try {
         const res = await apiClient.patch(`/wallets/${id}`, input)
         if (!res || !res.ok) return false
-        await fetchWallets()
+        emitDataChange(["wallets", "metrics"])
         return true
       } catch {
         return false
@@ -79,7 +81,7 @@ export const useWallets = () => {
         setIsUpdating(false)
       }
     },
-    [fetchWallets]
+    []
   )
 
   const deleteWallet = useCallback(
@@ -88,7 +90,7 @@ export const useWallets = () => {
       try {
         const res = await apiClient.delete(`/wallets/${id}`)
         if (!res || !res.ok) return false
-        await fetchWallets()
+        emitDataChange(["wallets", "transactions", "metrics"])
         return true
       } catch {
         return false
@@ -96,12 +98,14 @@ export const useWallets = () => {
         setIsDeleting(false)
       }
     },
-    [fetchWallets]
+    []
   )
 
   useEffect(() => {
     fetchWallets()
   }, [fetchWallets])
+
+  useDataRefetch(["wallets", "transactions", "credit-cards"], fetchWallets)
 
   return {
     wallets,

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
 import type { ExpenseByCategory } from "@/types/api"
 
@@ -50,6 +51,8 @@ export const useExpensesByCategory = (params: FetchParams = {}) => {
   useEffect(() => {
     fetchExpenses()
   }, [fetchExpenses])
+
+  useDataRefetch(["metrics"], fetchExpenses)
 
   return { data: expenses, isLoading, error, refetch: fetchExpenses }
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
 import type { NetWorthSummary } from "@/types/api"
 
@@ -44,6 +45,8 @@ export const useNetWorth = () => {
   useEffect(() => {
     fetchSummary()
   }, [fetchSummary])
+
+  useDataRefetch(["metrics"], fetchSummary)
 
   return { summary, isLoading, error, refetch: fetchSummary }
 }

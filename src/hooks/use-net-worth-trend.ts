@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useDataRefetch } from "@/hooks/use-data-refetch"
 import { apiClient } from "@/lib/api-client"
 import type { NetWorthTrendPoint } from "@/types/api"
 
@@ -37,6 +38,8 @@ export const useNetWorthTrend = () => {
   useEffect(() => {
     fetchTrend()
   }, [fetchTrend])
+
+  useDataRefetch(["metrics"], fetchTrend)
 
   return { trend, isLoading, error, refetch: fetchTrend }
 }
