@@ -39,6 +39,8 @@ export type Category = {
 export type TransactionType = "INCOME" | "EXPENSE" | "BALANCE_ADJUSTMENT"
 export type PaymentMethod = "CASH" | "PIX" | "TRANSFER" | "DEBIT" | "CREDIT"
 export type TransactionStatus = "PENDING" | "COMPLETED" | "CANCELLED"
+export type RecurrenceFrequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
+export type TransactionUpdateMode = "SINGLE" | "FUTURE"
 
 export type Transaction = {
   id: string
@@ -52,6 +54,7 @@ export type Transaction = {
   creditCardId: string | null
   categoryId: string | null
   installmentId?: string
+  recurringTransactionId?: string | null
   userId: string
   createdAt: string
   updatedAt: string

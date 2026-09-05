@@ -6,10 +6,12 @@ import { apiClient } from "@/lib/api-client"
 import { emitDataChange } from "@/lib/data-events"
 import type {
   PaymentMethod,
+  RecurrenceFrequency,
   Transaction,
   TransactionsMeta,
   TransactionStatus,
   TransactionType,
+  TransactionUpdateMode,
 } from "@/types/api"
 
 type FetchParams = {
@@ -36,9 +38,13 @@ export type CreateTransactionInput = {
   categoryId?: string
   date: string
   installments?: number
+  isRecurring?: boolean
+  recurrenceFrequency?: RecurrenceFrequency
 }
 
-export type UpdateTransactionInput = CreateTransactionInput
+export type UpdateTransactionInput = CreateTransactionInput & {
+  updateMode?: TransactionUpdateMode
+}
 
 export type TransactionMutationResult = { success: true } | { success: false; error: string }
 

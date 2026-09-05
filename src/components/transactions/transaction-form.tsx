@@ -52,7 +52,7 @@ import { useCreditCards } from '@/hooks/use-credit-cards'
 import { useWallets } from '@/hooks/use-wallets'
 import type { TransactionMutationResult } from '@/hooks/use-transactions'
 import { evaluateMathExpression } from '@/lib/evaluateMathExpression'
-import type { PaymentMethod } from '@/types/api'
+import type { PaymentMethod, RecurrenceFrequency } from '@/types/api'
 
 const typeOptions = [
   { value: 'EXPENSE', label: 'Despesa' },
@@ -65,6 +65,13 @@ const paymentMethodOptions: { value: PaymentMethod; label: string }[] = [
   { value: 'TRANSFER', label: 'Transferência' },
   { value: 'DEBIT', label: 'Débito' },
   { value: 'CREDIT', label: 'Crédito' },
+]
+
+const frequencyOptions: { value: RecurrenceFrequency; label: string }[] = [
+  { value: 'DAILY', label: 'Diariamente' },
+  { value: 'WEEKLY', label: 'Semanalmente' },
+  { value: 'MONTHLY', label: 'Mensalmente' },
+  { value: 'YEARLY', label: 'Anualmente' },
 ]
 
 const NEW_CATEGORY_DEFAULT_COLOR = '#7C3AED'
@@ -98,6 +105,8 @@ const transactionFormSchema = z
       .min(1, 'Mínimo de 1 parcela')
       .max(72, 'Máximo de 72 parcelas')
       .optional(),
+    isRecurring: z.boolean().optional(),
+    recurrenceFrequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']).optional(),
   })
   .refine((data) => data.type !== 'INCOME' || data.paymentMethod !== 'CREDIT', {
     message: 'Não é possível lançar receita em cartão de crédito',
@@ -111,6 +120,10 @@ const transactionFormSchema = z
     message: 'Selecione uma carteira',
     path: ['walletId'],
   })
+  .refine((data) => !data.isRecurring || !!data.recurrenceFrequency, {
+    message: 'Selecione a frequência de repetição',
+    path: ['recurrenceFrequency'],
+  })
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>
 export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & {
@@ -123,6 +136,7 @@ type TransactionFormProps = {
   onSuccess: () => void
   isSubmitting: boolean
   submitLabel: string
+  allowRecurrence?: boolean
 }
 
 const TransactionForm = ({
@@ -131,6 +145,7 @@ const TransactionForm = ({
   onSuccess,
   isSubmitting,
   submitLabel,
+  allowRecurrence = true,
 }: TransactionFormProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false)
@@ -153,6 +168,8 @@ const TransactionForm = ({
       date: new Date(),
       status: 'COMPLETED',
       installments: 1,
+      isRecurring: false,
+      recurrenceFrequency: undefined,
       ...defaultValues,
     },
   })
@@ -174,6 +191,8 @@ const TransactionForm = ({
     if (!rawAmount || isPlainNumber(rawAmount)) return null
     return evaluateMathExpression(rawAmount)
   }, [rawAmount])
+
+  const watchedIsRecurring = useWatch({ control: form.control, name: 'isRecurring' })
 
   const watchedInstallments = useWatch({ control: form.control, name: 'installments' })
   const installmentPreview = useMemo(() => {
@@ -220,6 +239,7 @@ const TransactionForm = ({
       walletId: isCreditCardAccount ? undefined : values.walletId,
       creditCardId: isCreditCardAccount ? values.creditCardId : undefined,
       installments: values.type === 'EXPENSE' ? values.installments : undefined,
+      recurrenceFrequency: values.isRecurring ? values.recurrenceFrequency : undefined,
     })
     if (!result.success) {
       setSubmitError(result.error ?? 'Ocorreu um erro inesperado. Tente novamente.')
@@ -658,6 +678,68 @@ const TransactionForm = ({
             </FormItem>
           )}
         />
+
+        {allowRecurrence && (
+          <>
+            <FormField
+              control={form.control}
+              name="isRecurring"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between">
+                  <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                    REPETIR TRANSAÇÃO
+                  </FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value ?? false}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked)
+                        if (checked && !form.getValues('recurrenceFrequency')) {
+                          form.setValue('recurrenceFrequency', 'MONTHLY', { shouldValidate: true })
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {watchedIsRecurring && (
+              <FormField
+                control={form.control}
+                name="recurrenceFrequency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
+                      FREQUÊNCIA
+                    </FormLabel>
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={(value: string | null) => {
+                        if (value) field.onChange(value as RecurrenceFrequency)
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione a frequência" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {frequencyOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </>
+        )}
 
         {submitError && <p className="text-expense text-sm text-center">{submitError}</p>}
 
