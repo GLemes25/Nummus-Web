@@ -48,6 +48,30 @@ export type UpdateTransactionInput = CreateTransactionInput & {
 
 export type TransactionMutationResult = { success: true } | { success: false; error: string }
 
+type CreateRecurringTransactionPayload = {
+  description: string
+  amount: number
+  type: "INCOME" | "EXPENSE"
+  paymentMethod: PaymentMethod
+  frequency: RecurrenceFrequency
+  startDate: string
+  walletId?: string
+  categoryId?: string
+}
+
+const mapToRecurringTransactionPayload = (
+  input: CreateTransactionInput
+): CreateRecurringTransactionPayload => ({
+  description: input.description,
+  amount: input.amount,
+  type: input.type,
+  paymentMethod: input.paymentMethod,
+  frequency: input.recurrenceFrequency as RecurrenceFrequency,
+  startDate: input.date,
+  walletId: input.walletId,
+  categoryId: input.categoryId,
+})
+
 export const useTransactions = (params: FetchParams = {}) => {
   const isEnabled = params.enabled ?? true
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -167,7 +191,9 @@ export const useTransactions = (params: FetchParams = {}) => {
     async (input: CreateTransactionInput): Promise<TransactionMutationResult> => {
       setIsCreating(true)
       try {
-        const res = await apiClient.post("/transactions", input)
+        const res = input.isRecurring
+          ? await apiClient.post("/recurring-transactions", mapToRecurringTransactionPayload(input))
+          : await apiClient.post("/transactions", input)
         if (!res || !res.ok) {
           const data = res ? await res.json().catch(() => null) : null
           return { success: false, error: data?.error ?? "Erro ao salvar transação" }
