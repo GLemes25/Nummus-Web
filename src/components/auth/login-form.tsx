@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import AuthDivider from "@/components/auth/auth-divider"
+import GoogleSignInButton from "@/components/auth/google-sign-in-button"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -56,6 +58,10 @@ const LoginForm = () => {
           <h1 className="text-foreground mb-1.5 text-2xl font-bold">Entrar</h1>
           <p className="text-muted-foreground text-sm">Acesse sua conta Nummus</p>
         </div>
+
+        <GoogleSignInButton callbackURL="/dashboard" onError={setLoginError} />
+
+        <AuthDivider />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
