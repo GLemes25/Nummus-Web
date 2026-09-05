@@ -169,7 +169,7 @@ const TransactionForm = ({
       status: 'COMPLETED',
       installments: 1,
       isRecurring: false,
-      recurrenceFrequency: undefined,
+      recurrenceFrequency: 'MONTHLY',
       ...defaultValues,
     },
   })
@@ -722,7 +722,12 @@ const TransactionForm = ({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecione a frequência" />
+                          <SelectValue placeholder="Selecione a frequência">
+                            {(value: RecurrenceFrequency) =>
+                              frequencyOptions.find((option) => option.value === value)?.label ??
+                              'Selecione a frequência'
+                            }
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
