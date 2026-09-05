@@ -14,7 +14,7 @@ type UpdateCategoryInput = {
   name: string;
   color: string;
   icon: string;
-  parentId: string | null;
+  parentId?: string;
 };
 
 type EditCategoryModalProps = {
@@ -59,7 +59,7 @@ const EditCategoryModal = ({
       name: values.name,
       color: values.color,
       icon: values.icon,
-      parentId: values.parentId === NO_PARENT ? null : values.parentId,
+      parentId: values.parentId === NO_PARENT ? undefined : values.parentId,
     });
     if (isSuccess) {
       onClose();

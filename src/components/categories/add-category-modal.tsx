@@ -14,14 +14,14 @@ type CreateCategoryInput = {
   name: string;
   color: string;
   icon: string;
-  parentId: string | null;
+  parentId?: string;
 };
 
 type AddCategoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
   categories: Category[];
-  onCreateCategory: (input: CreateCategoryInput) => Promise<boolean>;
+  onCreateCategory: (input: CreateCategoryInput) => Promise<Category | null>;
   isCreating: boolean;
 };
 
@@ -40,16 +40,16 @@ const AddCategoryModal = ({
   isCreating,
 }: AddCategoryModalProps) => {
   const handleSubmit = async (values: CategoryFormValues) => {
-    const isSuccess = await onCreateCategory({
+    const created = await onCreateCategory({
       name: values.name,
       color: values.color,
       icon: values.icon,
-      parentId: values.parentId === NO_PARENT ? null : values.parentId,
+      parentId: values.parentId === NO_PARENT ? undefined : values.parentId,
     });
-    if (isSuccess) {
+    if (created) {
       onClose();
     }
-    return isSuccess;
+    return !!created;
   };
 
   return (

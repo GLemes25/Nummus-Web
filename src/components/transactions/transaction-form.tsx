@@ -6,9 +6,12 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
   CalendarIcon,
+  Check,
+  ChevronsUpDown,
   CreditCard as CreditCardIcon,
   Loader2,
   Lock,
+  Plus,
   Slash,
   Wallet as WalletIcon,
 } from 'lucide-react'
@@ -16,6 +19,15 @@ import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import {
   Form,
@@ -55,7 +67,8 @@ const paymentMethodOptions: { value: PaymentMethod; label: string }[] = [
   { value: 'CREDIT', label: 'Crédito' },
 ]
 
-const NO_CATEGORY = '__none__'
+const NEW_CATEGORY_DEFAULT_COLOR = '#7C3AED'
+const NEW_CATEGORY_DEFAULT_ICON = 'tag'
 
 const isPlainNumber = (value: string) => /^\d+(\.\d+)?$/.test(value.trim())
 
@@ -120,10 +133,12 @@ const TransactionForm = ({
   submitLabel,
 }: TransactionFormProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false)
+  const [categoryQuery, setCategoryQuery] = useState('')
 
   const { wallets } = useWallets()
   const { creditCards } = useCreditCards()
-  const { categories } = useCategories()
+  const { categories, createCategory, isCreating: isCreatingCategory } = useCategories()
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionFormSchema),
@@ -167,6 +182,29 @@ const TransactionForm = ({
     if (evaluated === null || evaluated <= 0) return null
     return { count: watchedInstallments, value: evaluated / watchedInstallments }
   }, [watchedType, watchedInstallments, rawAmount])
+
+  const normalizedCategoryQuery = categoryQuery.trim().toLowerCase()
+  const filteredCategories = normalizedCategoryQuery
+    ? categories.filter((category) => category.name.toLowerCase().includes(normalizedCategoryQuery))
+    : categories
+  const canCreateCategory =
+    normalizedCategoryQuery.length > 0 &&
+    !categories.some((category) => category.name.toLowerCase() === normalizedCategoryQuery)
+
+  const handleCreateCategory = async () => {
+    const name = categoryQuery.trim()
+    if (!name) return
+    const created = await createCategory({
+      name,
+      color: NEW_CATEGORY_DEFAULT_COLOR,
+      icon: NEW_CATEGORY_DEFAULT_ICON,
+    })
+    if (created) {
+      form.setValue('categoryId', created.id, { shouldValidate: true })
+      setCategoryQuery('')
+      setIsCategoryPickerOpen(false)
+    }
+  }
 
   const handleSubmit = async (values: TransactionFormValues) => {
     setSubmitError(null)
@@ -307,50 +345,109 @@ const TransactionForm = ({
                 <FormLabel className="text-muted-foreground text-xs tracking-[0.8px]">
                   CATEGORIA
                 </FormLabel>
-                <Select
-                  value={field.value ?? NO_CATEGORY}
-                  onValueChange={(value) => field.onChange(value === NO_CATEGORY ? undefined : value)}
+                <Popover
+                  open={isCategoryPickerOpen}
+                  onOpenChange={(open: boolean) => {
+                    setIsCategoryPickerOpen(open)
+                    if (!open) setCategoryQuery('')
+                  }}
                 >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione uma categoria">
-                        {selectedCategory ? (
-                          <span className="flex items-center gap-2">
-                            <DynamicIcon name={selectedCategory.icon} size={16} className="shrink-0" />
-                            {selectedCategory.name}
-                            {selectedCategory.isSystem && (
-                              <Lock size={12} className="shrink-0 text-muted-foreground" />
-                            )}
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
+                  <PopoverTrigger
+                    render={
+                      <FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          role="combobox"
+                          className="w-full justify-between gap-2 bg-zinc-900 font-normal"
+                        >
+                          {selectedCategory ? (
+                            <span className="flex items-center gap-2 truncate">
+                              <DynamicIcon name={selectedCategory.icon} size={16} className="shrink-0" />
+                              <span className="truncate">{selectedCategory.name}</span>
+                              {selectedCategory.isSystem && (
+                                <Lock size={12} className="shrink-0 text-muted-foreground" />
+                              )}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2 text-muted-foreground">
+                              <Slash size={16} className="shrink-0" />
+                              Sem categoria
+                            </span>
+                          )}
+                          <ChevronsUpDown size={14} className="shrink-0 text-muted-foreground" />
+                        </Button>
+                      </FormControl>
+                    }
+                  />
+                  <PopoverContent className="w-80 p-0" align="start">
+                    <Command shouldFilter={false}>
+                      <CommandInput
+                        placeholder="Buscar ou criar categoria…"
+                        value={categoryQuery}
+                        onValueChange={setCategoryQuery}
+                      />
+                      <CommandList>
+                        <CommandGroup>
+                          <CommandItem
+                            onSelect={() => {
+                              field.onChange(undefined)
+                              setIsCategoryPickerOpen(false)
+                              setCategoryQuery('')
+                            }}
+                          >
                             <Slash size={16} className="shrink-0 text-muted-foreground" />
                             Sem categoria
-                          </span>
+                            {!field.value && <Check size={14} className="ml-auto shrink-0" />}
+                          </CommandItem>
+                          {filteredCategories.map((category) => (
+                            <CommandItem
+                              key={category.id}
+                              value={category.id}
+                              onSelect={() => {
+                                field.onChange(category.id)
+                                setIsCategoryPickerOpen(false)
+                                setCategoryQuery('')
+                              }}
+                            >
+                              <DynamicIcon name={category.icon} size={16} className="shrink-0" />
+                              <span className="truncate">{category.name}</span>
+                              {category.isSystem && (
+                                <Lock size={12} className="shrink-0 text-muted-foreground" />
+                              )}
+                              {field.value === category.id && (
+                                <Check size={14} className="ml-auto shrink-0" />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                        {filteredCategories.length === 0 && !canCreateCategory && (
+                          <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
                         )}
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent sideOffset={4} className="max-h-72">
-                    <SelectItem value={NO_CATEGORY}>
-                      <span className="flex items-center gap-2">
-                        <Slash size={16} className="shrink-0 text-muted-foreground" />
-                        Sem categoria
-                      </span>
-                    </SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        <span className="flex items-center gap-2">
-                          <DynamicIcon name={category.icon} size={16} className="shrink-0" />
-                          {category.name}
-                          {category.isSystem && (
-                            <Lock size={12} className="shrink-0 text-muted-foreground" />
-                          )}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                        {canCreateCategory && (
+                          <>
+                            <CommandSeparator />
+                            <CommandGroup>
+                              <CommandItem
+                                value={`__create__${normalizedCategoryQuery}`}
+                                disabled={isCreatingCategory}
+                                onSelect={handleCreateCategory}
+                                className="text-brand"
+                              >
+                                {isCreatingCategory ? (
+                                  <Loader2 size={16} className="shrink-0 animate-spin" />
+                                ) : (
+                                  <Plus size={16} className="shrink-0" />
+                                )}
+                                Criar categoria &quot;{categoryQuery.trim()}&quot;
+                              </CommandItem>
+                            </CommandGroup>
+                          </>
+                        )}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )

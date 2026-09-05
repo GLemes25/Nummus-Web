@@ -8,14 +8,14 @@ type CreateCategoryInput = {
   name: string
   color: string
   icon: string
-  parentId: string | null
+  parentId?: string
 }
 
 type UpdateCategoryInput = {
   name: string
   color: string
   icon: string
-  parentId: string | null
+  parentId?: string
 }
 
 export const useCategories = () => {
@@ -52,15 +52,21 @@ export const useCategories = () => {
   }, [])
 
   const createCategory = useCallback(
-    async (input: CreateCategoryInput): Promise<boolean> => {
+    async (input: CreateCategoryInput): Promise<Category | null> => {
       setIsCreating(true)
       try {
         const res = await apiClient.post("/categories", input)
-        if (!res || !res.ok) return false
+        if (!res || !res.ok) {
+          const errorBody = await res?.json().catch(() => null)
+          console.error("Falha ao criar categoria", errorBody)
+          return null
+        }
+        const created: Category = await res.json()
         await fetchCategories()
-        return true
-      } catch {
-        return false
+        return created
+      } catch (error) {
+        console.error("Falha ao criar categoria", error)
+        return null
       } finally {
         setIsCreating(false)
       }
@@ -73,10 +79,15 @@ export const useCategories = () => {
       setIsUpdating(true)
       try {
         const res = await apiClient.patch(`/categories/${id}`, input)
-        if (!res || !res.ok) return false
+        if (!res || !res.ok) {
+          const errorBody = await res?.json().catch(() => null)
+          console.error("Falha ao atualizar categoria", errorBody)
+          return false
+        }
         await fetchCategories()
         return true
-      } catch {
+      } catch (error) {
+        console.error("Falha ao atualizar categoria", error)
         return false
       } finally {
         setIsUpdating(false)
