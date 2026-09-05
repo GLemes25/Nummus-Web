@@ -4,6 +4,7 @@
 
 - **Sintaxe:** **SEMPRE** utilize _arrow functions_ para a criação de componentes React.
 - **Isolamento:** **NUNCA** crie mais de um componente no mesmo arquivo. Cada componente deve ter seu próprio arquivo exclusivo.
+- **Evitar Duplicidade (DRY):** **NUNCA** duplique blocos de JSX/lógica (ex: um mesmo botão, formulário, card ou trecho de UI) copiando-os entre múltiplos componentes. Ao identificar que um trecho está repetido ou prestes a ser repetido em 2+ arquivos, **SEMPRE** extraia-o para um componente próprio e reutilizável em seu próprio arquivo (seguindo a regra de Isolamento acima), e importe-o nos locais que precisam dele.
 
 ## Sistema de UI (shadcn/ui)
 
