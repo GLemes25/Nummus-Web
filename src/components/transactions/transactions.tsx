@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Trash2, Edit3, MoreHorizontal, Loader2, CheckCircle } from 'lucide-react'
+import { Trash2, Edit3, MoreHorizontal, Loader2, CheckCircle, ArrowRightLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicIcon } from '@/components/ui/dynamic-icon'
 import MonthSelector from '@/components/ui/month-selector'
@@ -50,6 +50,12 @@ const formatDate = (dateStr: string): string => {
   if (d.toDateString() === yesterday.toDateString()) return 'Ontem'
   return d.toLocaleDateString('pt-BR', { month: 'long', day: 'numeric' })
 }
+
+const isTransferIn = (tx: Transaction) =>
+  tx.paymentMethod === 'TRANSFER' && tx.description === 'Transfer in'
+
+const isTransferOut = (tx: Transaction) =>
+  tx.paymentMethod === 'TRANSFER' && tx.description === 'Transfer out'
 
 const groupByDate = (txs: Transaction[]) => {
   const groups: Record<string, Transaction[]> = {}
@@ -124,12 +130,15 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
     setRealizingId(null)
   }
 
-  const grouped = groupByDate(transactions)
+  const visibleTransactions = transactions.filter((tx) => !isTransferIn(tx))
+  const grouped = groupByDate(visibleTransactions)
   const dateKeys = Object.keys(grouped)
 
-  const totalIncome = transactions.filter((t) => t.type === 'INCOME').reduce((s, t) => s + t.amount, 0)
+  const totalIncome = transactions
+    .filter((t) => t.type === 'INCOME' && t.paymentMethod !== 'TRANSFER')
+    .reduce((s, t) => s + t.amount, 0)
   const totalExpense = transactions
-    .filter((t) => t.type === 'EXPENSE')
+    .filter((t) => t.type === 'EXPENSE' && t.paymentMethod !== 'TRANSFER')
     .reduce((s, t) => s + t.amount, 0)
 
   return (
@@ -199,98 +208,133 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                 </div>
 
                 <div className="bg-card border border-border rounded-xl overflow-hidden">
-                  {grouped[dateLabel].map((tx, i) => (
-                    <div
-                      key={tx.id}
-                      className={`flex items-center px-4 py-3.5 hover:bg-foreground/2 transition-colors ${
-                        tx.status === 'PENDING'
-                          ? 'opacity-60 border border-dashed border-border'
-                          : ''
-                      }`}
-                      style={{
-                        borderBottom:
-                          i < grouped[dateLabel].length - 1 && tx.status !== 'PENDING'
-                            ? '1px solid var(--border)'
-                            : undefined,
-                      }}
-                    >
+                  {grouped[dateLabel].map((tx, i) => {
+                    const isTransfer = isTransferOut(tx)
+                    return (
                       <div
-                        className="w-10.5 h-10.5 rounded-[11px] flex items-center justify-center mr-3.5 shrink-0"
+                        key={tx.id}
+                        className={`flex items-center px-4 py-3.5 transition-colors ${
+                          isTransfer ? 'bg-transfer text-transfer-foreground' : 'hover:bg-foreground/2'
+                        } ${
+                          tx.status === 'PENDING'
+                            ? 'opacity-60 border border-dashed border-border'
+                            : ''
+                        }`}
                         style={{
-                          backgroundColor: (tx.category?.color ?? '#71717a') + '22',
-                          border: `1px solid ${tx.category?.color ?? '#71717a'}44`,
+                          borderBottom:
+                            i < grouped[dateLabel].length - 1 && tx.status !== 'PENDING' && !isTransfer
+                              ? '1px solid var(--border)'
+                              : undefined,
                         }}
                       >
-                        <DynamicIcon name={tx.category?.icon ?? 'circle'} size={19} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-foreground text-sm font-medium mb-0.5 truncate">
-                          {tx.description}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-zinc-600 text-xs">{tx.category?.name ?? 'Sem categoria'}</span>
-                          {tx.wallet && (
-                            <>
-                              <span className="text-zinc-700 text-xs">·</span>
-                              <span className="text-zinc-700 text-xs">{tx.wallet.name}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0 ml-4">
                         <div
-                          className={`font-bold text-[15px] tracking-tight ${
-                            tx.type === 'INCOME' ? 'text-income' : 'text-expense'
+                          className={`w-10.5 h-10.5 rounded-[11px] flex items-center justify-center mr-3.5 shrink-0 ${
+                            isTransfer ? 'bg-transfer-foreground/20 border border-transfer-foreground/30' : ''
                           }`}
-                        >
-                          {tx.type === 'INCOME' ? '+' : '-'}R$ {formatCurrency(tx.amount)}
-                        </div>
-                        <div className="text-zinc-700 text-xs mt-0.5">{typeLabels[tx.type]}</div>
-                      </div>
-                      {tx.status === 'PENDING' && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isRealizing && realizingId === tx.id}
-                          onClick={() => handleRealizeTransaction(tx.id)}
-                          className="ml-2 shrink-0 w-8 h-8 text-income hover:text-income hover:bg-income/10"
-                          title="Dar baixa"
-                        >
-                          {isRealizing && realizingId === tx.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <CheckCircle size={16} />
-                          )}
-                        </Button>
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="ml-2 shrink-0 w-8 h-8 text-zinc-600 hover:text-foreground"
-                            >
-                              <MoreHorizontal size={14} />
-                            </Button>
+                          style={
+                            isTransfer
+                              ? undefined
+                              : {
+                                  backgroundColor: (tx.category?.color ?? '#71717a') + '22',
+                                  border: `1px solid ${tx.category?.color ?? '#71717a'}44`,
+                                }
                           }
-                        />
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => setEditingTransaction(tx)}>
-                            <Edit3 size={14} />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => setDeletingTransaction(tx)}
+                        >
+                          {isTransfer ? (
+                            <ArrowRightLeft size={19} className="text-transfer-foreground" />
+                          ) : (
+                            <DynamicIcon name={tx.category?.icon ?? 'circle'} size={19} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className={`text-sm font-medium mb-0.5 truncate ${
+                              isTransfer ? 'text-transfer-foreground' : 'text-foreground'
+                            }`}
                           >
-                            <Trash2 size={14} />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  ))}
+                            {tx.description}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs ${isTransfer ? 'text-transfer-foreground/70' : 'text-zinc-600'}`}>
+                              {isTransfer ? 'Transferência' : tx.category?.name ?? 'Sem categoria'}
+                            </span>
+                            {tx.wallet && (
+                              <>
+                                <span className={`text-xs ${isTransfer ? 'text-transfer-foreground/50' : 'text-zinc-700'}`}>
+                                  ·
+                                </span>
+                                <span className={`text-xs ${isTransfer ? 'text-transfer-foreground/50' : 'text-zinc-700'}`}>
+                                  {tx.wallet.name}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0 ml-4">
+                          <div
+                            className={`font-bold text-[15px] tracking-tight ${
+                              isTransfer
+                                ? 'text-transfer-foreground'
+                                : tx.type === 'INCOME'
+                                  ? 'text-income'
+                                  : 'text-expense'
+                            }`}
+                          >
+                            {isTransfer ? '' : tx.type === 'INCOME' ? '+' : '-'}R$ {formatCurrency(tx.amount)}
+                          </div>
+                          <div className={`text-xs mt-0.5 ${isTransfer ? 'text-transfer-foreground/70' : 'text-zinc-700'}`}>
+                            {isTransfer ? 'transferência' : typeLabels[tx.type]}
+                          </div>
+                        </div>
+                        {tx.status === 'PENDING' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isRealizing && realizingId === tx.id}
+                            onClick={() => handleRealizeTransaction(tx.id)}
+                            className="ml-2 shrink-0 w-8 h-8 text-income hover:text-income hover:bg-income/10"
+                            title="Dar baixa"
+                          >
+                            {isRealizing && realizingId === tx.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <CheckCircle size={16} />
+                            )}
+                          </Button>
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`ml-2 shrink-0 w-8 h-8 ${
+                                  isTransfer
+                                    ? 'text-transfer-foreground/70 hover:text-transfer-foreground hover:bg-transfer-foreground/10'
+                                    : 'text-zinc-600 hover:text-foreground'
+                                }`}
+                              >
+                                <MoreHorizontal size={14} />
+                              </Button>
+                            }
+                          />
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setEditingTransaction(tx)}>
+                              <Edit3 size={14} />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setDeletingTransaction(tx)}
+                            >
+                              <Trash2 size={14} />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )
+                  })}
                 </div>
               </motion.div>
             ))
