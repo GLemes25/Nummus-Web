@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select'
 import { useWallets } from '@/hooks/use-wallets'
 import { apiClient } from '@/lib/api-client'
+import { emitDataChange } from '@/lib/data-events'
 import { evaluateMathExpression } from '@/lib/evaluateMathExpression'
 
 const isPlainNumber = (value: string) => /^\d+(\.\d+)?$/.test(value.trim())
@@ -102,6 +103,7 @@ const TransferForm = ({ onSuccess }: TransferFormProps) => {
         setSubmitError(data?.error ?? 'Erro ao realizar transferência')
         return
       }
+      emitDataChange(['transactions', 'wallets', 'metrics'])
       onSuccess()
     } catch {
       setSubmitError('Ocorreu um erro inesperado. Tente novamente.')
