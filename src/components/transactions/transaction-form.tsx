@@ -124,6 +124,10 @@ const transactionFormSchema = z
     message: 'Selecione a frequência de repetição',
     path: ['recurrenceFrequency'],
   })
+  .refine((data) => !data.isRecurring || !!data.categoryId, {
+    message: 'Categoria é obrigatória para transações recorrentes',
+    path: ['categoryId'],
+  })
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>
 export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & {
