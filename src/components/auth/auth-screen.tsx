@@ -181,7 +181,7 @@ const AuthScreen = ({ onAuth }: AuthScreenProps) => {
           </p>
         </div>
 
-        <GoogleSignInButton callbackURL="/dashboard" onError={setAuthError} />
+        <GoogleSignInButton callbackURL="/" onError={setAuthError} />
 
         <AuthDivider />
 
