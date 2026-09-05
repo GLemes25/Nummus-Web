@@ -13,6 +13,8 @@
   --color-gold: var(--gold);
   --color-income: var(--income);
   --color-expense: var(--expense);
+  --color-transfer: var(--transfer);
+  --color-transfer-foreground: var(--transfer-foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
@@ -61,6 +63,8 @@
   --gold: oklch(0.73 0.085 68);
   --income: oklch(0.68 0.17 162);
   --expense: oklch(0.57 0.22 15);
+  --transfer: oklch(0.32 0.14 258);
+  --transfer-foreground: oklch(0.985 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
