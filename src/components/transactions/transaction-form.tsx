@@ -124,6 +124,10 @@ const transactionFormSchema = z
     message: 'Selecione a frequência de repetição',
     path: ['recurrenceFrequency'],
   })
+  .refine((data) => !data.isRecurring || !!data.categoryId, {
+    message: 'Categoria é obrigatória para transações recorrentes',
+    path: ['categoryId'],
+  })
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>
 export type TransactionFormSubmitValues = Omit<TransactionFormValues, 'amount'> & {
@@ -169,7 +173,7 @@ const TransactionForm = ({
       status: 'COMPLETED',
       installments: 1,
       isRecurring: false,
-      recurrenceFrequency: undefined,
+      recurrenceFrequency: 'MONTHLY',
       ...defaultValues,
     },
   })
@@ -722,7 +726,12 @@ const TransactionForm = ({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecione a frequência" />
+                          <SelectValue placeholder="Selecione a frequência">
+                            {(value: RecurrenceFrequency) =>
+                              frequencyOptions.find((option) => option.value === value)?.label ??
+                              'Selecione a frequência'
+                            }
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
