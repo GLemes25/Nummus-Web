@@ -17,7 +17,9 @@ const GoogleSignInButton = ({ callbackURL, onError }: GoogleSignInButtonProps) =
   const handleClick = async () => {
     onError(null)
     setIsLoading(true)
-    const { error } = await signIn.social({ provider: "google", callbackURL })
+    const absoluteCallbackURL =
+      typeof window !== "undefined" ? `${window.location.origin}${callbackURL}` : callbackURL
+    const { error } = await signIn.social({ provider: "google", callbackURL: absoluteCallbackURL })
     if (error) {
       onError("Não foi possível entrar com o Google. Tente novamente.")
       setIsLoading(false)
