@@ -59,7 +59,7 @@ const LoginForm = () => {
           <p className="text-muted-foreground text-sm">Acesse sua conta Nummus</p>
         </div>
 
-        <GoogleSignInButton callbackURL="/dashboard" onError={setLoginError} />
+        <GoogleSignInButton callbackURL="/" onError={setLoginError} />
 
         <AuthDivider />
 
