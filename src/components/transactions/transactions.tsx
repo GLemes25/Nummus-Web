@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import EditTransactionModal from '@/components/transactions/edit-transaction-modal'
+import EditTransferModal from '@/components/transactions/edit-transfer-modal'
 import TransactionFilters from '@/components/transactions/transaction-filters'
 import { useDateFilter } from '@/hooks/use-date-filter'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -78,6 +79,7 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
   const [walletId, setWalletId] = useState(ALL_VALUE)
   const [creditCardId, setCreditCardId] = useState(ALL_VALUE)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [editingTransfer, setEditingTransfer] = useState<Transaction | null>(null)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [realizingId, setRealizingId] = useState<string | null>(null)
@@ -319,7 +321,13 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
                             }
                           />
                           <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => setEditingTransaction(tx)}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                tx.paymentMethod === 'TRANSFER'
+                                  ? setEditingTransfer(tx)
+                                  : setEditingTransaction(tx)
+                              }
+                            >
                               <Edit3 size={14} />
                               Editar
                             </DropdownMenuItem>
@@ -348,6 +356,13 @@ const Transactions = ({ onNewTransaction }: TransactionsProps) => {
         transaction={editingTransaction}
         onUpdateTransaction={updateTransaction}
         isUpdating={isUpdating}
+      />
+
+      <EditTransferModal
+        key={editingTransfer?.id ?? 'none'}
+        isOpen={!!editingTransfer}
+        onClose={() => setEditingTransfer(null)}
+        transaction={editingTransfer}
       />
 
       <AlertDialog

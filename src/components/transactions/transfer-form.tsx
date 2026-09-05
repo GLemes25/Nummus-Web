@@ -54,13 +54,16 @@ const transferFormSchema = z
     path: ['destinationWalletId'],
   })
 
-type TransferFormValues = z.infer<typeof transferFormSchema>
+export type TransferFormValues = z.infer<typeof transferFormSchema>
 
 type TransferFormProps = {
+  transferId?: string
+  defaultValues?: Partial<TransferFormValues>
+  submitLabel?: string
   onSuccess: () => void
 }
 
-const TransferForm = ({ onSuccess }: TransferFormProps) => {
+const TransferForm = ({ transferId, defaultValues, submitLabel = 'Realizar Transferência', onSuccess }: TransferFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -73,6 +76,7 @@ const TransferForm = ({ onSuccess }: TransferFormProps) => {
       destinationWalletId: wallets[1]?.id ?? wallets[0]?.id ?? '',
       amount: '',
       date: new Date(),
+      ...defaultValues,
     },
   })
 
@@ -92,15 +96,20 @@ const TransferForm = ({ onSuccess }: TransferFormProps) => {
     setIsSubmitting(true)
     setSubmitError(null)
     try {
-      const res = await apiClient.post('/transfers', {
+      const payload = {
         sourceWalletId: values.sourceWalletId,
         destinationWalletId: values.destinationWalletId,
         amount,
         date: values.date.toISOString(),
-      })
+      }
+      const res = transferId
+        ? await apiClient.patch(`/transfers/${transferId}`, payload)
+        : await apiClient.post('/transfers', payload)
       if (!res || !res.ok) {
         const data = res ? await res.json().catch(() => null) : null
-        setSubmitError(data?.error ?? 'Erro ao realizar transferência')
+        setSubmitError(
+          data?.error ?? (transferId ? 'Erro ao atualizar transferência' : 'Erro ao realizar transferência')
+        )
         return
       }
       emitDataChange(['transactions', 'wallets', 'metrics'])
@@ -272,7 +281,7 @@ const TransferForm = ({ onSuccess }: TransferFormProps) => {
           disabled={isSubmitting}
           className="w-full mt-1 bg-brand text-brand-foreground hover:bg-brand/90 font-semibold text-[15px]"
         >
-          {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Realizar Transferência'}
+          {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
         </Button>
       </form>
     </Form>
